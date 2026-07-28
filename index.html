@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Course Planner — Purdue Engineering Degree Path Optimization</title>
+<meta name="description" content="A constraint-based degree scheduler for six Purdue engineering majors, built to explore optimization and scheduling theory as an academic planning problem.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><b>SCP</b> / Smart Course Planner</a>
+    <div class="nav-links">
+      <a href="#problem">Problem</a>
+      <a href="#model">Model</a>
+      <a href="#complexity">Complexity</a>
+      <a href="#features">Features</a>
+      <a href="planner.html" class="cta">Open Planner</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap hero">
+  <div class="eyebrow">Personal project · Engineering @ Purdue</div>
+  <h1>Turning "when do I graduate?" into a constraint satisfaction problem.</h1>
+  <p class="subtitle">Smart Course Planner is a degree-scheduling tool built around six real Purdue engineering curricula — Industrial, Mechanical, Electrical, Civil, and Chemical Engineering, plus Computer Science. Instead of manually checking prerequisites and credit caps every semester, it models each degree as a dependency graph, solves for the fastest feasible path to graduation, and proves — mathematically, not just empirically — how close that path is to optimal.</p>
+  <div class="hero-ctas">
+    <a href="planner.html" class="btn btn-primary">Open the Planner →</a>
+    <a href="#model" class="btn btn-outline">Read the model</a>
+  </div>
+  <div class="hero-meta">
+    <div class="hero-meta-item"><div class="n">6</div><div class="l">Majors modeled</div></div>
+    <div class="hero-meta-item"><div class="n">245</div><div class="l">Courses across all programs</div></div>
+    <div class="hero-meta-item"><div class="n">12–19</div><div class="l">Adjustable credit cap</div></div>
+    <div class="hero-meta-item"><div class="n">O(n²)</div><div class="l">Greedy scheduling pass</div></div>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">01 — The Problem</div>
+      <div class="section-title">Every engineering student re-derives the same schedule by hand.</div>
+      <p class="section-body">Purdue's First-Year Engineering program lets students explore majors before declaring — which is great for exploration, but it means the actual path from "undecided" to a specific degree is buried across catalog PDFs, prerequisite chains, and credit-cap rules that most students only discover by trial and error each advising cycle, and that path looks completely different depending which major you land on. The underlying question — "if I take X credits a semester, how many semesters until I graduate?" — is a scheduling problem with real structure: a dependency graph and a capacity constraint, repeated across six different degree structures. That structure is exactly what industrial engineers are trained to model.</p>
+    </div>
+  </div>
+</section>
+
+<section id="model">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">02 — The Model</div>
+      <div class="section-title">Framed as a scheduling optimization, not a checklist.</div>
+      <p class="section-body">Each of the six degrees is represented as its own directed acyclic graph — 40 to 43 courses apiece. Solving "what should I take, and when" is a lightweight relative of an integer program:</p>
+    </div>
+    <div class="model-grid">
+      <div class="model-cell">
+        <div class="k">Decision Variable</div>
+        <div class="v">x[course, semester] ∈ {0, 1}</div>
+        <p>Whether a given course is taken in a given semester.</p>
+      </div>
+      <div class="model-cell">
+        <div class="k">Constraints</div>
+        <div class="v">prereqs(c) ⊆ completed-before(s)<br>Σ credits(s) ≤ cap</div>
+        <p>A course can't be scheduled until every prerequisite lands in a strictly earlier semester, and no semester exceeds the credit cap the student sets.</p>
+      </div>
+      <div class="model-cell">
+        <div class="k">Objective</div>
+        <div class="v">minimize Σ semesters</div>
+        <p>Reach graduation in as few semesters as possible without violating the constraints above.</p>
+      </div>
+    </div>
+    <p class="section-body" style="margin-top:26px;">The planner solves this with a <b>greedy topological scheduler</b> rather than a true ILP solver: at each step it computes the longest remaining dependency chain for every unfinished course (its distance from the capstone), and prioritizes courses on that critical path so they never become the bottleneck. Unlike a plain heuristic, though, the tool doesn't just trust the greedy result — it checks it. See the Complexity section below.</p>
+  </div>
+</section>
+
+<section id="complexity">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">03 — Complexity &amp; Optimality</div>
+      <div class="section-title">Proving the schedule is good, not just hoping it is.</div>
+      <p class="section-body">This scheduling problem — assign tasks with precedence constraints into the fewest possible capacity-limited batches — is a variant of <b>precedence-constrained scheduling</b> (related to P|prec|C<sub>max</sub> in scheduling-theory notation), which is <b>NP-hard</b> in general. For a graph with 40+ courses and a dozen-plus eligible electives per semester, brute-forcing every possible assignment isn't computationally realistic in a browser. Running an exact ILP solver (OR-Tools, CBC) would work, but at this scale a much cheaper technique does almost the same job:</p>
+    </div>
+    <div class="model-grid">
+      <div class="model-cell">
+        <div class="k">Lower Bound 1 — Capacity</div>
+        <div class="v">⌈ Σ remaining credits / cap ⌉</div>
+        <p>No schedule can finish faster than total remaining credits divided by the per-semester cap, rounded up — regardless of prerequisites.</p>
+      </div>
+      <div class="model-cell">
+        <div class="k">Lower Bound 2 — Critical Path</div>
+        <div class="v">longest chain + 1</div>
+        <p>If course E requires D requires C requires B requires A, that's 5 semesters minimum, no matter how much room is left in the credit cap.</p>
+      </div>
+      <div class="model-cell">
+        <div class="k">The Check</div>
+        <div class="v">greedy result == max(LB1, LB2) ?</div>
+        <p>If the greedy schedule matches the larger of the two bounds, it is <i>provably</i> optimal — no better schedule can exist, full stop.</p>
+      </div>
+    </div>
+    <p class="section-body" style="margin-top:26px;">This is a classic <b>combinatorial relaxation bound</b>: instead of solving the hard problem exactly, solve two easy relaxations of it and use whichever gives the stronger (larger) bound. Run against all six majors' full 8-semester plans at an 18-credit cap, the greedy scheduler matches this lower bound exactly for IE, ME, ChemE, and CE — <b>provably optimal</b>, zero semesters to spare. For ECE and CS it lands one semester above the bound — a small, honestly-reported gap, since closing it exactly would require exponential search. The planner shows this live: open any major and the optimizer panel displays the current gap (or the ✓ when it's zero).</p>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">04 — Features</div>
+      <div class="section-title">What the planner actually does.</div>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="icon">🎓</span>
+        <h3>Six majors, one tool</h3>
+        <p>Switch between IE, ME, ECE, CS, ChemE, and CE with one click — each with its own real course graph, progress tracking, and optimality check.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">📐</span>
+        <h3>Live re-scheduling</h3>
+        <p>Drag the credit-cap slider and the entire remaining semester plan re-solves instantly — answers "how many semesters if I take 18 credits?" directly.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">✅</span>
+        <h3>Progress tracking</h3>
+        <p>Check off completed courses each semester. Progress is saved per-major locally, so switching majors never loses your place.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">🎯</span>
+        <h3>Optimality verification</h3>
+        <p>Every schedule is checked against a combinatorial lower bound — you see whether the plan is provably optimal, not just "probably fine."</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">🏁</span>
+        <h3>Graduation projection</h3>
+        <p>Combines completed courses with the optimizer's remaining path to project an actual semester and year of graduation.</p>
+      </div>
+      <div class="feature-card">
+        <span class="icon">📊</span>
+        <h3>GPA calculator</h3>
+        <p>Enter a letter grade for each completed course; cumulative GPA updates automatically, weighted by credit hours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">05 — Data &amp; Stack</div>
+      <div class="section-title">Sourced from Purdue's own catalog and department handbooks.</div>
+      <p class="section-body">Course lists, credit hours, and prerequisite chains come from Purdue's published plans of study and department curriculum handbooks for First-Year Engineering, Industrial, Mechanical, Electrical, Civil, and Chemical Engineering, and Computer Science. It's an unofficial planning aid, not a replacement for myPurduePlan / DegreeWorks or an academic advisor.</p>
+    </div>
+    <div class="stack-row">
+      <span class="stack-chip">Vanilla JS</span>
+      <span class="stack-chip">No build step</span>
+      <span class="stack-chip">Greedy graph scheduling</span>
+      <span class="stack-chip">Combinatorial lower-bound verification</span>
+      <span class="stack-chip">LocalStorage-style persistence</span>
+      <span class="stack-chip">Static — deployable on GitHub Pages</span>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Smart Course Planner is an independent student project and is not affiliated with or endorsed by Purdue University. Curriculum data may change — verify current requirements at catalog.purdue.edu.</p>
+    <p><a href="planner.html">Open Planner →</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
