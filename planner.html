@@ -82,6 +82,28 @@
     </details>
   </div>
 
+  <div class="tt-wrap" id="ttSection">
+    <div class="tt-head">
+      <h2>📅 Weekly Timetable</h2>
+      <span class="tt-sem-label" id="ttSemesterLabel"></span>
+    </div>
+    <div class="tt-note">Real class meeting times change every semester and aren't part of the degree plan itself — so set them yourself for the courses the optimizer just picked for your next semester. Toggle the days each course meets and set its start/end time; conflicts are flagged automatically.</div>
+    <div id="ttCourseInputs"></div>
+    <div class="tt-conflicts" id="ttConflicts"></div>
+    <div class="tt-grid-container" id="ttGrid"></div>
+  </div>
+
+  <div class="cal-wrap" id="calSection">
+    <div class="cal-head">
+      <h2>🗓 Semester Calendar</h2>
+      <span class="cal-badge" id="calConfirmBadge"></span>
+    </div>
+    <div class="cal-note">Fall 2026 and Spring 2027 use Purdue's officially published academic calendar. Later terms are projected forward from that pattern (same weekday, ~371 days later) since Purdue hasn't published them yet — verify with the Registrar as your term approaches.</div>
+    <div class="cal-keydates" id="calKeyDates"></div>
+    <button class="cal-export-btn" id="calExportBtn">⬇ Export to Calendar (.ics)</button>
+    <div class="cal-months" id="calMonths"></div>
+  </div>
+
   <div class="legend">
     <div class="legend-item"><span class="swatch" style="background:var(--gold)"></span>First-Year Engineering / Foundational</div>
     <div class="legend-item"><span class="swatch" style="background:var(--ie)"></span>Major Core</div>

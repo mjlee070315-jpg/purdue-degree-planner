@@ -436,6 +436,299 @@ function renderMajorSelector(){
   document.getElementById('programSchool').textContent = PROGRAMS[state.major].school;
 }
 
+const TT_DAYS = ['M','T','W','R','F'];
+const TT_DAY_LABELS = {M:'Mon',T:'Tue',W:'Wed',R:'Thu',F:'Fri'};
+const TT_START_HOUR = 8, TT_END_HOUR = 21; // 8:00am - 9:00pm
+const TT_PX_PER_HOUR = 48;
+
+function ttTimeToMinutes(t){
+  if(!t) return null;
+  const parts = t.split(':').map(Number);
+  return parts[0]*60 + parts[1];
+}
+
+function renderTimetable(nextSemCourses, prog){
+  const section = document.getElementById('ttSection');
+  const label = document.getElementById('ttSemesterLabel');
+  if(!nextSemCourses || nextSemCourses.length===0){
+    label.textContent = '';
+    document.getElementById('ttCourseInputs').innerHTML = '<div class="tt-empty-msg">Nothing left to schedule — every requirement is marked complete.</div>';
+    document.getElementById('ttGrid').innerHTML = '';
+    document.getElementById('ttConflicts').style.display = 'none';
+    return;
+  }
+
+  if(!prog.times){ prog.times = {}; }
+
+  const inputsEl = document.getElementById('ttCourseInputs');
+  inputsEl.innerHTML = '';
+  nextSemCourses.forEach(c=>{
+    const t = prog.times[c.id] || {days:[], start:'', end:''};
+    const row = document.createElement('div');
+    row.className = 'tt-course-row';
+    row.innerHTML = `
+      <span class="tt-course-label"><span class="cat-dot" style="background:${catColor(c.cat)}"></span>${c.id}</span>
+      <div class="tt-days">
+        ${TT_DAYS.map(d=>`<button type="button" class="tt-day-btn ${t.days.includes(d)?'active':''}" data-day="${d}" data-course="${c.id}">${d}</button>`).join('')}
+      </div>
+      <input type="time" class="tt-time-input tt-start" data-course="${c.id}" value="${t.start}">
+      <span style="color:var(--muted-dim);font-size:11px;">–</span>
+      <input type="time" class="tt-time-input tt-end" data-course="${c.id}" value="${t.end}">
+    `;
+    inputsEl.appendChild(row);
+  });
+
+  inputsEl.querySelectorAll('.tt-day-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cid = btn.getAttribute('data-course');
+      const day = btn.getAttribute('data-day');
+      if(!prog.times[cid]){ prog.times[cid] = {days:[], start:'', end:''}; }
+      const idx = prog.times[cid].days.indexOf(day);
+      if(idx>=0){ prog.times[cid].days.splice(idx,1); } else { prog.times[cid].days.push(day); }
+      btn.classList.toggle('active');
+      saveState();
+      renderTimetableGrid(nextSemCourses, prog);
+    });
+  });
+  inputsEl.querySelectorAll('.tt-start, .tt-end').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const cid = inp.getAttribute('data-course');
+      if(!prog.times[cid]){ prog.times[cid] = {days:[], start:'', end:''}; }
+      if(inp.classList.contains('tt-start')){ prog.times[cid].start = inp.value; }
+      else { prog.times[cid].end = inp.value; }
+      saveState();
+      renderTimetableGrid(nextSemCourses, prog);
+    });
+  });
+
+  renderTimetableGrid(nextSemCourses, prog);
+}
+
+function renderTimetableGrid(courses, prog){
+  const grid = document.getElementById('ttGrid');
+  const conflictsEl = document.getElementById('ttConflicts');
+  const gridHeight = (TT_END_HOUR - TT_START_HOUR) * TT_PX_PER_HOUR;
+
+  let html = '<div class="tt-grid-header"></div>';
+  TT_DAYS.forEach(d=>{ html += `<div class="tt-grid-header">${TT_DAY_LABELS[d]}</div>`; });
+
+  html += `<div class="tt-time-col" style="height:${gridHeight}px;">`;
+  for(let h=TT_START_HOUR; h<TT_END_HOUR; h++){
+    const label = (h%12===0?12:h%12) + (h>=12?'p':'a');
+    html += `<div style="position:absolute;top:${(h-TT_START_HOUR)*TT_PX_PER_HOUR - 6}px;right:5px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted-dim);">${label}</div>`;
+  }
+  html += '</div>';
+
+  const conflictMsgs = [];
+
+  TT_DAYS.forEach(day=>{
+    html += `<div class="tt-day-col" style="height:${gridHeight}px;">`;
+    const blocks = courses
+      .filter(c=>{ const t = prog.times[c.id]; return t && t.days.includes(day) && t.start && t.end; })
+      .map(c=>({course:c, t:prog.times[c.id], conflict:false}));
+
+    for(let i=0;i<blocks.length;i++){
+      for(let j=i+1;j<blocks.length;j++){
+        const s1 = ttTimeToMinutes(blocks[i].t.start), e1 = ttTimeToMinutes(blocks[i].t.end);
+        const s2 = ttTimeToMinutes(blocks[j].t.start), e2 = ttTimeToMinutes(blocks[j].t.end);
+        if(s1<e2 && s2<e1){
+          blocks[i].conflict = true; blocks[j].conflict = true;
+          conflictMsgs.push(`${blocks[i].course.id} ↔ ${blocks[j].course.id} on ${TT_DAY_LABELS[day]}`);
+        }
+      }
+    }
+
+    blocks.forEach(b=>{
+      const startMin = ttTimeToMinutes(b.t.start) - TT_START_HOUR*60;
+      const endMin = ttTimeToMinutes(b.t.end) - TT_START_HOUR*60;
+      if(endMin<=startMin) return;
+      const top = (startMin/60)*TT_PX_PER_HOUR;
+      const height = Math.max(((endMin-startMin)/60)*TT_PX_PER_HOUR, 18);
+      const color = catColor(b.course.cat);
+      html += `<div class="tt-block ${b.conflict?'conflict':''}" style="top:${top}px;height:${height}px;background:color-mix(in srgb, ${color} 18%, var(--bg-panel));border-color:${color};">
+        <b>${b.course.id}</b><br>${b.t.start}–${b.t.end}
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  grid.innerHTML = html;
+
+  if(conflictMsgs.length>0){
+    conflictsEl.innerHTML = '⚠ Time conflict: ' + conflictMsgs.join(' · ');
+    conflictsEl.style.display = 'block';
+  } else {
+    conflictsEl.style.display = 'none';
+  }
+}
+
+// ============================================================
+// Semester calendar (official Purdue 2026-27 dates + projection)
+// ============================================================
+const TERM_DATES_BASE = {
+  1: { // Fall 2026 — official
+    classesStart:'2026-08-24', classesEnd:'2026-12-12',
+    finalsStart:'2026-12-14', finalsEnd:'2026-12-19',
+    breaks:[ {name:'Fall Break', start:'2026-10-12', end:'2026-10-13'},
+             {name:'Thanksgiving Break', start:'2026-11-25', end:'2026-11-28'} ],
+    confirmed:true
+  },
+  2: { // Spring 2027 — official
+    classesStart:'2027-01-11', classesEnd:'2027-05-01',
+    finalsStart:'2027-05-03', finalsEnd:'2027-05-08',
+    breaks:[ {name:'Spring Break', start:'2027-03-15', end:'2027-03-20'} ],
+    confirmed:true
+  }
+};
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function dateKey(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+function shiftDateStr(dateStr, days){
+  const d = new Date(dateStr+'T00:00:00');
+  d.setDate(d.getDate()+days);
+  return dateKey(d);
+}
+
+function getTermDates(absTerm){
+  if(TERM_DATES_BASE[absTerm]) return TERM_DATES_BASE[absTerm];
+  const isFall = (absTerm % 2 === 1);
+  const baseTerm = isFall ? 1 : 2;
+  const base = TERM_DATES_BASE[baseTerm];
+  const cyclesAhead = Math.round((absTerm - baseTerm) / 2);
+  const shift = cyclesAhead * 371; // 53 weeks — keeps weekday, approximates a year
+  return {
+    classesStart: shiftDateStr(base.classesStart, shift),
+    classesEnd: shiftDateStr(base.classesEnd, shift),
+    finalsStart: shiftDateStr(base.finalsStart, shift),
+    finalsEnd: shiftDateStr(base.finalsEnd, shift),
+    breaks: base.breaks.map(b=>({name:b.name, start:shiftDateStr(b.start,shift), end:shiftDateStr(b.end,shift)})),
+    confirmed:false
+  };
+}
+
+function buildDayTypeMap(termDates){
+  const map = {};
+  function markRange(start,end,type){
+    let d = new Date(start+'T00:00:00');
+    const endD = new Date(end+'T00:00:00');
+    while(d<=endD){ map[dateKey(d)] = type; d.setDate(d.getDate()+1); }
+  }
+  markRange(termDates.finalsStart, termDates.finalsEnd, 'finals');
+  termDates.breaks.forEach(b=>markRange(b.start, b.end, 'break'));
+  map[termDates.classesStart] = 'classstart';
+  map[termDates.classesEnd] = 'classend';
+  return map;
+}
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderMonthGrid(year, monthIdx, dayTypeMap){
+  const dim = new Date(year, monthIdx+1, 0).getDate();
+  const firstDow = new Date(year, monthIdx, 1).getDay();
+  let html = `<div class="cal-month"><div class="cal-month-title">${MONTH_NAMES[monthIdx]} ${year}</div><div class="cal-grid">`;
+  ['S','M','T','W','T','F','S'].forEach(d=>{ html += `<div class="cal-dow">${d}</div>`; });
+  for(let i=0;i<firstDow;i++){ html += '<div class="cal-day empty"></div>'; }
+  for(let day=1; day<=dim; day++){
+    const key = year+'-'+pad2(monthIdx+1)+'-'+pad2(day);
+    const type = dayTypeMap[key] || '';
+    html += `<div class="cal-day ${type}">${day}</div>`;
+  }
+  html += '</div></div>';
+  return html;
+}
+
+let currentNextSemCourses = [];
+let currentTermDates = null;
+
+function renderCalendar(absTermNext){
+  const badge = document.getElementById('calConfirmBadge');
+  const kd = document.getElementById('calKeyDates');
+  const monthsEl = document.getElementById('calMonths');
+
+  if(!absTermNext){
+    badge.textContent = ''; kd.innerHTML=''; monthsEl.innerHTML=''; currentTermDates=null;
+    return;
+  }
+
+  const termDates = getTermDates(absTermNext);
+  currentTermDates = termDates;
+
+  badge.textContent = termDates.confirmed ? '✓ official dates' : '≈ projected dates';
+  badge.className = 'cal-badge ' + (termDates.confirmed ? 'confirmed' : 'estimated');
+
+  kd.innerHTML = `
+    <span><span class="kd-dot" style="background:var(--complete)"></span>First day: ${termDates.classesStart}</span>
+    <span><span class="kd-dot" style="background:var(--gold-bright)"></span>Last day of classes: ${termDates.classesEnd}</span>
+    <span><span class="kd-dot" style="background:var(--danger)"></span>Finals: ${termDates.finalsStart} – ${termDates.finalsEnd}</span>
+    ${termDates.breaks.map(b=>`<span><span class="kd-dot" style="background:var(--science)"></span>${b.name}: ${b.start} – ${b.end}</span>`).join('')}
+  `;
+
+  const dayTypeMap = buildDayTypeMap(termDates);
+  const startD = new Date(termDates.classesStart+'T00:00:00');
+  const endD = new Date(termDates.finalsEnd+'T00:00:00');
+  let months = [];
+  let cursor = new Date(startD.getFullYear(), startD.getMonth(), 1);
+  while(cursor <= endD){
+    months.push({year:cursor.getFullYear(), month:cursor.getMonth()});
+    cursor.setMonth(cursor.getMonth()+1);
+  }
+  monthsEl.innerHTML = months.map(m=>renderMonthGrid(m.year, m.month, dayTypeMap)).join('');
+}
+
+// ---- .ics export ----
+const ICS_DAY_MAP = {M:'MO',T:'TU',W:'WE',R:'TH',F:'FR'};
+const JS_WEEKDAY = {M:1,T:2,W:3,R:4,F:5};
+
+function nextOccurrence(startDateStr, jsWeekday){
+  let d = new Date(startDateStr+'T00:00:00');
+  while(d.getDay() !== jsWeekday){ d.setDate(d.getDate()+1); }
+  return d;
+}
+function icsDateTime(d,h,m){
+  return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'T'+pad2(h)+pad2(m)+'00';
+}
+
+function generateICS(courses, prog, termDates){
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Smart Course Planner//EN','CALSCALE:GREGORIAN'];
+  const now = new Date();
+  const dtstamp = now.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  const untilStr = termDates.classesEnd.replace(/-/g,'') + 'T235900Z';
+
+  courses.forEach(c=>{
+    const t = prog.times[c.id];
+    if(!t || !t.days || t.days.length===0 || !t.start || !t.end) return;
+    const byday = t.days.map(d=>ICS_DAY_MAP[d]).join(',');
+    const earliestDay = t.days.slice().sort((a,b)=>JS_WEEKDAY[a]-JS_WEEKDAY[b])[0];
+    const dtstartDate = nextOccurrence(termDates.classesStart, JS_WEEKDAY[earliestDay]);
+    const [sh,sm] = t.start.split(':').map(Number);
+    const [eh,em] = t.end.split(':').map(Number);
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:'+c.id+'-'+now.getTime()+'@smartcourseplanner');
+    lines.push('DTSTAMP:'+dtstamp);
+    lines.push('DTSTART:'+icsDateTime(dtstartDate,sh,sm));
+    lines.push('DTEND:'+icsDateTime(dtstartDate,eh,em));
+    lines.push('RRULE:FREQ=WEEKLY;BYDAY='+byday+';UNTIL='+untilStr);
+    lines.push('SUMMARY:'+c.id+' \u2014 '+c.name.replace(/,/g,''));
+    lines.push('END:VEVENT');
+  });
+
+  function addAllDay(name, dateStr){
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:'+name.replace(/\s/g,'')+'-'+dateStr+'@smartcourseplanner');
+    lines.push('DTSTAMP:'+dtstamp);
+    lines.push('DTSTART;VALUE=DATE:'+dateStr.replace(/-/g,''));
+    lines.push('SUMMARY:'+name);
+    lines.push('END:VEVENT');
+  }
+  addAllDay('First Day of Classes', termDates.classesStart);
+  addAllDay('Last Day of Classes', termDates.classesEnd);
+  addAllDay('Final Exams Begin', termDates.finalsStart);
+  termDates.breaks.forEach(b=>addAllDay(b.name, b.start));
+
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+
 function render(){
   renderMajorSelector();
 
@@ -552,10 +845,40 @@ function render(){
       render();
     });
   });
+
+  // ---- weekly timetable + semester calendar for the next scheduled semester ----
+  if(schedule.length>0){
+    const absTermNext = maxCompletedTerm + schedule[0].term;
+    document.getElementById('ttSemesterLabel').textContent = termLabel(absTermNext);
+    currentNextSemCourses = schedule[0].courses;
+    renderTimetable(currentNextSemCourses, prog);
+    renderCalendar(absTermNext);
+  } else {
+    currentNextSemCourses = [];
+    renderTimetable([], prog);
+    renderCalendar(null);
+  }
 }
 
 function initPlanner(){
   document.getElementById('creditCap').addEventListener('input', render);
+  document.getElementById('calExportBtn').addEventListener('click', ()=>{
+    if(!currentTermDates || currentNextSemCourses.length===0){
+      alert('Nothing to export yet — set at least one course\'s days/time in the timetable above first.');
+      return;
+    }
+    const prog = getProgress();
+    const ics = generateICS(currentNextSemCourses, prog, currentTermDates);
+    const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = state.major + '-next-semester.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
   document.querySelectorAll('.major-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const m = btn.getAttribute('data-major');

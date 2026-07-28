@@ -188,6 +188,53 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 .opt-badge.opt-good{color:var(--complete);border-color:var(--complete);background:rgba(127,169,127,0.08);}
 .opt-badge.opt-gap{color:var(--gold-bright);border-color:var(--gold-bright);background:rgba(207,185,145,0.06);}
 
+/* ---- Weekly timetable builder ---- */
+.tt-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:28px;}
+.tt-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;}
+.tt-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;}
+.tt-sem-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);}
+.tt-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+.tt-course-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(207,185,145,0.05);flex-wrap:wrap;}
+.tt-course-label{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink);min-width:150px;}
+.tt-days{display:flex;gap:4px;}
+.tt-day-btn{width:26px;height:26px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;}
+.tt-day-btn:hover{color:var(--ink);}
+.tt-day-btn.active{background:var(--gold-bright);color:var(--bg);border-color:var(--gold-bright);}
+.tt-time-input{background:var(--bg-panel-raised);border:1px solid var(--border);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;color-scheme:dark;}
+.tt-conflicts{display:none;margin:14px 0;padding:10px 14px;border:1px solid var(--danger);color:var(--danger);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;background:rgba(184,80,47,0.08);}
+.tt-grid-container{display:grid;grid-template-columns:44px repeat(5,1fr);border:1px solid var(--border);margin-top:18px;background:var(--bg);}
+.tt-grid-header{padding:8px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);border-left:1px solid var(--border);}
+.tt-grid-header:first-child{border-left:none;}
+.tt-time-col{position:relative;}
+.tt-day-col{position:relative;border-left:1px solid var(--border);background-image:repeating-linear-gradient(to bottom, rgba(207,185,145,0.05) 0, rgba(207,185,145,0.05) 1px, transparent 1px, transparent 48px);}
+.tt-block{position:absolute;left:3px;right:3px;border-radius:2px;padding:3px 5px;font-size:10px;line-height:1.35;overflow:hidden;border:1px solid;font-family:'IBM Plex Mono',monospace;}
+.tt-block.conflict{border-color:var(--danger)!important;box-shadow:0 0 0 1px var(--danger);}
+.tt-empty-msg{padding:24px;text-align:center;color:var(--muted-dim);font-size:12px;}
+
+/* ---- Semester calendar ---- */
+.cal-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:28px;}
+.cal-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:4px;}
+.cal-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;}
+.cal-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border:1px solid;text-transform:uppercase;letter-spacing:0.05em;}
+.cal-badge.confirmed{color:var(--complete);border-color:var(--complete);}
+.cal-badge.estimated{color:var(--muted);border-color:var(--muted-dim);}
+.cal-note{font-size:11.5px;color:var(--muted-dim);margin-bottom:14px;line-height:1.6;}
+.cal-keydates{display:flex;flex-wrap:wrap;gap:8px 20px;margin:6px 0 18px;font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+.cal-keydates .kd-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
+.cal-export-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--bg);background:var(--gold-bright);border:none;padding:9px 16px;cursor:pointer;letter-spacing:0.04em;margin-bottom:20px;}
+.cal-export-btn:hover{background:var(--gold);}
+.cal-months{display:flex;flex-wrap:wrap;gap:18px;}
+.cal-month{width:220px;}
+.cal-month-title{font-family:'Space Grotesk',sans-serif;font-size:12.5px;color:var(--ink);margin-bottom:8px;text-align:center;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.cal-dow{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted-dim);text-align:center;padding:2px 0;}
+.cal-day{font-family:'IBM Plex Mono',monospace;font-size:10px;text-align:center;padding:4px 0;color:var(--muted);}
+.cal-day.empty{visibility:hidden;}
+.cal-day.classstart{background:rgba(127,169,127,0.2);color:var(--complete);font-weight:600;}
+.cal-day.classend{background:rgba(207,185,145,0.22);color:var(--gold-bright);font-weight:600;}
+.cal-day.finals{background:rgba(184,80,47,0.16);color:var(--danger);}
+.cal-day.break{background:rgba(124,154,171,0.2);color:var(--science);}
+
 .reset-btn{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);background:none;border:1px solid var(--border);padding:5px 10px;cursor:pointer;letter-spacing:0.05em;}
 .reset-btn:hover{border-color:var(--gold);color:var(--gold);}
 .status-msg{font-size:10.5px;color:var(--muted-dim);font-family:'IBM Plex Mono',monospace;}

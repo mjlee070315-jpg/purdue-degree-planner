@@ -42,6 +42,23 @@ of the true optimum. Run against all six majors at an 18-credit cap: IE,
 ME, ChemE, and CE come back provably optimal; ECE and CS land one semester
 above the bound.
 
+## Weekly timetable & semester calendar
+
+Below the optimizer, the planner shows the courses scheduled for your
+*next* semester and lets you assign real meeting days/times to each one
+(actual class times change every semester and aren't part of the degree
+plan itself). It renders as a weekly grid and flags time conflicts
+automatically.
+
+Underneath that, a semester calendar shows the actual Purdue academic
+calendar for that term — first/last day of classes, breaks, and finals
+week — using Purdue's officially published 2026–27 dates for Fall 2026 and
+Spring 2027, and a same-weekday projection (+371 days per year) for later
+terms Purdue hasn't published yet. A **⬇ Export to Calendar (.ics)** button
+generates a standard iCalendar file with recurring weekly class events plus
+the semester's key dates, importable into Google Calendar, Apple Calendar,
+or Outlook.
+
 ## Project structure
 
 ```
