@@ -88,7 +88,7 @@ h1{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;margin:
 .meta-value{font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--gold-bright);margin-top:4px;font-weight:600;}
 
 /* ---- Dashboard stats ---- */
-.dash{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:26px;}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:26px;}
 .stat{background:var(--bg-panel);padding:16px 18px;}
 .stat-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.09em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
 .stat-value{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;color:var(--ink);}
@@ -98,7 +98,7 @@ h1{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;margin:
 /* ---- Optimizer panel ---- */
 .optimizer{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:28px;}
 .optimizer-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
-.optimizer h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;}
+.optimizer h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;display:flex;align-items:center;}
 .optimizer-note{font-size:12px;color:var(--muted);max-width:640px;line-height:1.6;}
 .slider-row{display:flex;align-items:center;gap:16px;margin-top:14px;}
 .slider-row label{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);white-space:nowrap;}
@@ -191,7 +191,7 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 /* ---- Weekly timetable builder ---- */
 .tt-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:28px;}
 .tt-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;}
-.tt-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;}
+.tt-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;display:flex;align-items:center;}
 .tt-sem-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);}
 .tt-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
 .tt-course-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(207,185,145,0.05);flex-wrap:wrap;}
@@ -214,14 +214,15 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 /* ---- Semester calendar ---- */
 .cal-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:28px;}
 .cal-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:4px;}
-.cal-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;}
+.cal-wrap h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;display:flex;align-items:center;}
 .cal-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:2px 8px;border:1px solid;text-transform:uppercase;letter-spacing:0.05em;}
 .cal-badge.confirmed{color:var(--complete);border-color:var(--complete);}
 .cal-badge.estimated{color:var(--muted);border-color:var(--muted-dim);}
 .cal-note{font-size:11.5px;color:var(--muted-dim);margin-bottom:14px;line-height:1.6;}
 .cal-keydates{display:flex;flex-wrap:wrap;gap:8px 20px;margin:6px 0 18px;font-size:11.5px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
 .cal-keydates .kd-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle;}
-.cal-export-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--bg);background:var(--gold-bright);border:none;padding:9px 16px;cursor:pointer;letter-spacing:0.04em;margin-bottom:20px;}
+.cal-export-btn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--bg);background:var(--gold-bright);border:none;padding:9px 16px;cursor:pointer;letter-spacing:0.04em;margin-bottom:20px;display:inline-flex;align-items:center;}
+.cal-export-btn .icon-inline{color:var(--bg);margin-right:7px;}
 .cal-export-btn:hover{background:var(--gold);}
 .cal-months{display:flex;flex-wrap:wrap;gap:18px;}
 .cal-month{width:220px;}
@@ -276,9 +277,28 @@ section{padding:56px 0;border-top:1px solid var(--border);}
 .feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:28px;}
 @media(max-width:800px){.feature-grid{grid-template-columns:1fr;}}
 .feature-card{border:1px solid var(--border);background:var(--bg-panel);padding:22px 24px;}
-.feature-card .icon{font-size:20px;margin-bottom:12px;display:block;}
+.feature-card .icon{display:block;margin-bottom:14px;color:var(--gold);}
+.feature-card .icon svg{width:22px;height:22px;}
 .feature-card h3{font-family:'Space Grotesk',sans-serif;font-size:15px;margin:0 0 8px;}
 .feature-card p{font-size:12.5px;color:var(--muted);line-height:1.7;margin:0;}
+
+/* ---- Inline icon utility (headers, buttons) ---- */
+.icon-inline{width:16px;height:16px;vertical-align:-3px;margin-right:7px;color:var(--gold);flex:none;}
+
+/* ---- Currently Taking panel ---- */
+.current-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:22px;}
+.current-head h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0;letter-spacing:0.01em;display:flex;align-items:center;}
+.current-note{font-size:12px;color:var(--muted);line-height:1.6;margin:10px 0 16px;}
+.current-group-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.09em;color:var(--gold);text-transform:uppercase;margin:16px 0 6px;}
+.current-group-label:first-child{margin-top:0;}
+.current-course-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(207,185,145,0.05);flex-wrap:wrap;}
+.current-course-row input[type=checkbox]{accent-color:var(--complete);width:15px;height:15px;flex:none;cursor:pointer;}
+.current-course-code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink);min-width:70px;}
+.current-course-name{font-size:12px;color:var(--muted);flex:1;min-width:140px;}
+.current-course-credits{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted-dim);}
+select.predicted-grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:3px 6px;}
+.current-empty-msg{font-size:12px;color:var(--muted-dim);padding:16px 0;}
+.roadmap-label{display:flex;align-items:center;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ink);margin-bottom:12px;}
 
 .stack-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
 .stack-chip{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);border:1px solid var(--border);padding:6px 12px;}

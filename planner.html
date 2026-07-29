@@ -51,15 +51,26 @@
 
   <div class="dash">
     <div class="stat"><div class="stat-label">Credits Completed</div><div class="stat-value" id="statCompleted">0</div><div class="stat-sub" id="statCompletedSub">of — total</div></div>
+    <div class="stat"><div class="stat-label">In Progress</div><div class="stat-value" id="statInProgress">0</div><div class="stat-sub" id="statInProgressSub">0 courses this semester</div></div>
     <div class="stat"><div class="stat-label">Credits Remaining</div><div class="stat-value accent" id="statRemaining">—</div></div>
     <div class="stat"><div class="stat-label">Semesters Left</div><div class="stat-value accent" id="statSemesters">—</div></div>
     <div class="stat"><div class="stat-label">Projected Graduation</div><div class="stat-value" id="statGrad" style="font-size:19px;">—</div></div>
-    <div class="stat"><div class="stat-label">Cumulative GPA</div><div class="stat-value" id="statGPA">—</div><div class="stat-sub" id="statGPASub">no grades entered</div></div>
+    <div class="stat"><div class="stat-label">Current GPA</div><div class="stat-value" id="statGPA">—</div><div class="stat-sub" id="statGPASub">no grades entered</div></div>
+    <div class="stat"><div class="stat-label">Projected GPA</div><div class="stat-value accent" id="statProjGPA">—</div><div class="stat-sub" id="statProjGPASub">add predicted grades below</div></div>
+  </div>
+
+  <div class="current-wrap">
+    <div class="current-head">
+      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4.5C2 3.7 2.7 3 3.5 3H9a1 1 0 011 1v12a1 1 0 00-1-1H3.5c-.8 0-1.5-.7-1.5-1.5V4.5z"/><path d="M18 4.5c0-.8-.7-1.5-1.5-1.5H11a1 1 0 00-1 1v12a1 1 0 011-1h5.5c.8 0 1.5-.7 1.5-1.5V4.5z"/></svg>Currently Taking</h2>
+    </div>
+    <div class="current-note">Set what you're actually enrolled in this semester — the roadmap below is generated for <i>after</i> this semester. Only courses whose prerequisites are already marked complete are offered. Add a predicted grade to see how it would move your GPA.</div>
+    <div id="currentCourseList"></div>
+    <div class="current-empty-msg" id="currentEmptyMsg" style="display:none;">No eligible courses to add — mark some courses as completed first, or you've already set your full course load.</div>
   </div>
 
   <div class="optimizer">
     <div class="optimizer-head">
-      <h2>⚙ Schedule Optimizer</h2>
+      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="3"/><path d="M10 2v2.2M10 15.8V18M18 10h-2.2M4.2 10H2M15.5 4.5l-1.6 1.6M6.1 13.9l-1.6 1.6M15.5 15.5l-1.6-1.6M6.1 6.1L4.5 4.5"/></svg>Schedule Optimizer</h2>
       <span class="status-msg" id="saveStatus">progress saved locally to this browser</span>
     </div>
     <div class="optimizer-note">Check off courses as you complete them. The scheduler re-solves the remaining prerequisite graph on every change: it prioritizes courses on the longest remaining dependency chain (the critical path to the capstone), then packs each semester up to your credit cap. This is a greedy heuristic for what is really an integer program — decision variable <code>x[course, semester] ∈ {0,1}</code>, prerequisite + credit-cap constraints, objective: minimize semesters to graduation.</div>
@@ -84,7 +95,7 @@
 
   <div class="tt-wrap" id="ttSection">
     <div class="tt-head">
-      <h2>📅 Weekly Timetable</h2>
+      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3M7 11h1M12 11h1M7 14h1M12 14h1"/></svg>Weekly Timetable</h2>
       <span class="tt-sem-label" id="ttSemesterLabel"></span>
     </div>
     <div class="tt-note">Real class meeting times change every semester and aren't part of the degree plan itself — so set them yourself for the courses the optimizer just picked for your next semester. Toggle the days each course meets and set its start/end time; conflicts are flagged automatically.</div>
@@ -95,12 +106,12 @@
 
   <div class="cal-wrap" id="calSection">
     <div class="cal-head">
-      <h2>🗓 Semester Calendar</h2>
+      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3"/><circle cx="10" cy="12.5" r="1.6" fill="currentColor" stroke="none"/></svg>Semester Calendar</h2>
       <span class="cal-badge" id="calConfirmBadge"></span>
     </div>
     <div class="cal-note">Fall 2026 and Spring 2027 use Purdue's officially published academic calendar. Later terms are projected forward from that pattern (same weekday, ~371 days later) since Purdue hasn't published them yet — verify with the Registrar as your term approaches.</div>
     <div class="cal-keydates" id="calKeyDates"></div>
-    <button class="cal-export-btn" id="calExportBtn">⬇ Export to Calendar (.ics)</button>
+    <button class="cal-export-btn" id="calExportBtn"><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" style="color:inherit;"><path d="M10 3v10M6 9l4 4 4-4M4 16.5h12"/></svg>Export to Calendar (.ics)</button>
     <div class="cal-months" id="calMonths"></div>
   </div>
 
@@ -111,6 +122,11 @@
     <div class="legend-item"><span class="swatch" style="background:var(--elective)"></span>Elective</div>
     <div class="legend-item"><span class="badge crit">Critical</span>Blocks downstream courses if delayed</div>
     <div class="legend-item"><span class="badge opt">Optimization</span>The OR / optimization course (IE only)</div>
+  </div>
+
+  <div class="roadmap-label">
+    <svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 10h3l2-5 4 10 2-5h3"/></svg>
+    Roadmap — remaining semesters after what you're currently taking
   </div>
 
   <div class="semgrid" id="semgrid"></div>

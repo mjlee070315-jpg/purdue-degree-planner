@@ -313,8 +313,11 @@ const STORAGE_KEY = 'purdue-planner-state-v2';
 const hasArtifactStorage = typeof window !== 'undefined' && !!window.storage;
 
 function getProgress(){
-  if(!state.progress[state.major]){ state.progress[state.major] = {completed:{}, grades:{}}; }
-  return state.progress[state.major];
+  if(!state.progress[state.major]){ state.progress[state.major] = {completed:{}, grades:{}, inprogress:{}, predicted:{}, times:{}}; }
+  const p = state.progress[state.major];
+  if(!p.inprogress){ p.inprogress = {}; }
+  if(!p.predicted){ p.predicted = {}; }
+  return p;
 }
 
 function getCourses(){
@@ -414,13 +417,16 @@ function catColor(cat){
   return {fye:'var(--gold)', major:'var(--ie)', support:'var(--science)', elective:'var(--elective)'}[cat] || 'var(--muted)';
 }
 
-function computeGPA(){
+function computeGPA(mode){
   const prog = getProgress();
   const courses = getCourses();
   let points=0, hours=0;
   courses.forEach(c=>{
     if(prog.completed[c.id] && prog.grades[c.id] && GRADE_POINTS[prog.grades[c.id]]!==undefined){
       points += GRADE_POINTS[prog.grades[c.id]] * c.credits;
+      hours += c.credits;
+    } else if(mode==='projected' && prog.inprogress[c.id] && prog.predicted[c.id] && GRADE_POINTS[prog.predicted[c.id]]!==undefined){
+      points += GRADE_POINTS[prog.predicted[c.id]] * c.credits;
       hours += c.credits;
     }
   });
@@ -729,6 +735,80 @@ function generateICS(courses, prog, termDates){
   return lines.join('\r\n');
 }
 
+function renderCurrentlyTaking(courses, prog){
+  const listEl = document.getElementById('currentCourseList');
+  const emptyEl = document.getElementById('currentEmptyMsg');
+  const completedOnly = new Set(Object.keys(prog.completed).filter(id=>prog.completed[id]));
+
+  const eligible = courses.filter(c=>
+    !prog.completed[c.id] && !prog.inprogress[c.id] &&
+    c.prereq.every(p=>completedOnly.has(p))
+  );
+
+  const taking = courses.filter(c=>prog.inprogress[c.id]);
+
+  listEl.innerHTML = '';
+
+  if(taking.length>0){
+    const groupLabel = document.createElement('div');
+    groupLabel.className = 'current-group-label';
+    groupLabel.textContent = 'TAKING NOW';
+    listEl.appendChild(groupLabel);
+    taking.forEach(c=>{
+      listEl.appendChild(buildCurrentRow(c, prog, true));
+    });
+  }
+
+  if(eligible.length>0){
+    const groupLabel2 = document.createElement('div');
+    groupLabel2.className = 'current-group-label';
+    groupLabel2.textContent = 'ELIGIBLE TO ADD (prerequisites met)';
+    listEl.appendChild(groupLabel2);
+    eligible.forEach(c=>{
+      listEl.appendChild(buildCurrentRow(c, prog, false));
+    });
+  }
+
+  emptyEl.style.display = (taking.length===0 && eligible.length===0) ? 'block' : 'none';
+
+  listEl.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', e=>{
+      const id = e.target.getAttribute('data-id');
+      const p = getProgress();
+      p.inprogress[id] = e.target.checked;
+      if(!e.target.checked){ delete p.predicted[id]; }
+      saveState();
+      render();
+    });
+  });
+  listEl.querySelectorAll('select.predicted-grade').forEach(sel=>{
+    sel.addEventListener('change', e=>{
+      const id = e.target.getAttribute('data-id');
+      getProgress().predicted[id] = e.target.value;
+      saveState();
+      render();
+    });
+  });
+}
+
+function buildCurrentRow(c, prog, isTaking){
+  const row = document.createElement('div');
+  row.className = 'current-course-row';
+  const pred = prog.predicted[c.id] || '';
+  row.innerHTML = `
+    <input type="checkbox" data-id="${c.id}" ${isTaking?'checked':''}>
+    <span class="cat-dot" style="background:${catColor(c.cat)}"></span>
+    <span class="current-course-code">${c.id}</span>
+    <span class="current-course-name">${c.name}</span>
+    <span class="current-course-credits">${c.credits} cr</span>
+    ${isTaking?`<select class="predicted-grade" data-id="${c.id}">
+      <option value="">predicted grade…</option>
+      ${Object.keys(GRADE_POINTS).map(g=>`<option value="${g}" ${pred===g?'selected':''}>${g}</option>`).join('')}
+    </select>`:''}
+  `;
+  return row;
+}
+
 function render(){
   renderMajorSelector();
 
@@ -741,26 +821,36 @@ function render(){
   document.getElementById('creditCapVal').textContent = maxCredits;
 
   const completedIds = Object.keys(prog.completed).filter(id=>prog.completed[id]);
-  const schedule = buildSchedule(completedIds, maxCredits, courses);
+  const inprogressIds = Object.keys(prog.inprogress).filter(id=>prog.inprogress[id]);
+  const satisfiedIds = completedIds.concat(inprogressIds);
+  const schedule = buildSchedule(satisfiedIds, maxCredits, courses);
 
   const completedCredits = courses.filter(c=>prog.completed[c.id]).reduce((s,c)=>s+c.credits,0);
+  const inProgressCredits = courses.filter(c=>prog.inprogress[c.id]).reduce((s,c)=>s+c.credits,0);
   document.getElementById('totalCreditsLabel').textContent = totalCredits + ' cr';
   document.getElementById('statCompleted').textContent = completedCredits;
   document.getElementById('statCompletedSub').textContent = 'of '+totalCredits+' total';
-  document.getElementById('statRemaining').textContent = (totalCredits - completedCredits);
+  document.getElementById('statInProgress').textContent = inProgressCredits;
+  document.getElementById('statInProgressSub').textContent = inprogressIds.length + ' course'+(inprogressIds.length===1?'':'s')+' this semester';
+  document.getElementById('statRemaining').textContent = (totalCredits - completedCredits - inProgressCredits);
   document.getElementById('statSemesters').textContent = schedule.length;
 
   let maxCompletedTerm = 0;
-  courses.forEach(c=>{ if(prog.completed[c.id]) maxCompletedTerm = Math.max(maxCompletedTerm, c.term); });
+  courses.forEach(c=>{ if(prog.completed[c.id] || prog.inprogress[c.id]) maxCompletedTerm = Math.max(maxCompletedTerm, c.term); });
   let absoluteGradTerm = maxCompletedTerm + schedule.length;
-  document.getElementById('statGrad').textContent = (schedule.length===0 && completedIds.length===courses.length) ? '🎓 Complete' : termLabel(absoluteGradTerm);
+  document.getElementById('statGrad').textContent = (schedule.length===0 && satisfiedIds.length===courses.length) ? '✓ Complete' : termLabel(absoluteGradTerm);
 
-  const gpa = computeGPA();
+  const gpa = computeGPA('actual');
+  const projGpa = computeGPA('projected');
   document.getElementById('statGPA').textContent = gpa===null ? '—' : gpa.toFixed(2);
   document.getElementById('statGPASub').textContent = gpa===null ? 'no grades entered' : 'based on completed courses';
+  document.getElementById('statProjGPA').textContent = projGpa===null ? '—' : projGpa.toFixed(2);
+  document.getElementById('statProjGPASub').textContent = projGpa===null ? 'add predicted grades below' : 'incl. predicted grades this semester';
+
+  renderCurrentlyTaking(courses, prog);
 
   // ---- optimality verification (lower bound technique) ----
-  const remainingCourses = courses.filter(c=>!prog.completed[c.id]);
+  const remainingCourses = courses.filter(c=>!prog.completed[c.id] && !prog.inprogress[c.id]);
   const lb = lowerBoundSemesters(remainingCourses, maxCredits);
   const gap = schedule.length - lb;
   const badge = document.getElementById('optimalityBadge');
@@ -781,7 +871,7 @@ function render(){
     done.style.padding='30px';
     done.style.textAlign='center';
     done.style.color='var(--muted)';
-    done.textContent = '🎓 All requirements marked complete.';
+    done.textContent = '✓ All requirements marked complete.';
     grid.appendChild(done);
   }
 
@@ -890,7 +980,7 @@ function initPlanner(){
   });
   document.getElementById('resetBtn').addEventListener('click', ()=>{
     if(confirm('Clear all completed courses and grades for the current major? This cannot be undone.')){
-      state.progress[state.major] = {completed:{}, grades:{}};
+      state.progress[state.major] = {completed:{}, grades:{}, inprogress:{}, predicted:{}, times:{}};
       saveState();
       render();
     }

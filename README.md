@@ -42,6 +42,22 @@ of the true optimum. Run against all six majors at an 18-credit cap: IE,
 ME, ChemE, and CE come back provably optimal; ECE and CS land one semester
 above the bound.
 
+## Currently taking & GPA projection
+
+Above the roadmap, a **Currently Taking** panel lists only the courses your
+completed prerequisites actually unlock — check the ones you're really
+enrolled in this semester, and the roadmap below regenerates for
+everything *after* that. Add a predicted grade to any in-progress course to
+see a **Projected GPA** alongside your actual **Current GPA**, so you can
+see where your GPA is headed before finals post.
+
+## Design
+
+Icons throughout are hand-drawn inline SVG (gear, compass, book, grid,
+calendar, chart, flag) in the same thin-stroke technical-drawing style as
+the rest of the interface — no emoji — colored in Purdue's official Old
+Gold to match the blueprint aesthetic.
+
 ## Weekly timetable & semester calendar
 
 Below the optimizer, the planner shows the courses scheduled for your
