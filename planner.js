@@ -883,6 +883,43 @@ function buildCurrentRow(c, prog, isTaking){
   return row;
 }
 
+const CAT_LABELS = {
+  fye: 'First-Year Engineering / Foundational',
+  major: 'Major Core',
+  support: 'Math / Science Support',
+  elective: 'Elective'
+};
+const CAT_ORDER = ['fye','major','support','elective'];
+
+function renderRequirementProgress(courses, prog){
+  const listEl = document.getElementById('reqProgressList');
+  listEl.innerHTML = '';
+  CAT_ORDER.forEach(cat=>{
+    const inCat = courses.filter(c=>c.cat===cat);
+    if(inCat.length===0) return;
+    const total = inCat.reduce((s,c)=>s+c.credits,0);
+    const completed = inCat.filter(c=>prog.completed[c.id]).reduce((s,c)=>s+c.credits,0);
+    const inProgress = inCat.filter(c=>prog.inprogress[c.id]).reduce((s,c)=>s+c.credits,0);
+    const pctDone = total>0 ? (completed/total*100) : 0;
+    const pctInProg = total>0 ? (inProgress/total*100) : 0;
+    const color = catColor(cat);
+
+    const row = document.createElement('div');
+    row.className = 'req-row';
+    row.innerHTML = `
+      <div class="req-row-top">
+        <span class="req-row-label"><span class="cat-dot" style="background:${color}"></span>${CAT_LABELS[cat]}</span>
+        <span class="req-row-frac">${completed}${inProgress>0?`+${inProgress}`:''} / ${total} cr</span>
+      </div>
+      <div class="req-bar-track">
+        <div class="req-bar-fill" style="width:${pctDone}%;background:${color};"></div>
+        <div class="req-bar-fill-inprog" style="left:${pctDone}%;width:${pctInProg}%;background:${color};"></div>
+      </div>
+    `;
+    listEl.appendChild(row);
+  });
+}
+
 function render(){
   renderMajorSelector();
 
@@ -922,6 +959,7 @@ function render(){
   document.getElementById('statProjGPASub').textContent = projGpa===null ? 'add predicted grades below' : 'incl. predicted grades this semester';
 
   renderCurrentlyTaking(courses, prog);
+  renderRequirementProgress(courses, prog);
 
   // ---- optimality verification (lower bound technique) ----
   const remainingCourses = courses.filter(c=>!prog.completed[c.id] && !prog.inprogress[c.id]);
