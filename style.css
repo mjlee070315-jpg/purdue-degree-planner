@@ -195,6 +195,16 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 .tt-sem-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--gold);}
 .tt-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
 .tt-course-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(207,185,145,0.05);flex-wrap:wrap;}
+.tt-course-group{padding:10px 0 14px;border-bottom:1px solid rgba(207,185,145,0.08);}
+.tt-course-group:last-child{border-bottom:none;}
+.tt-course-group-header{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.tt-course-code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);font-weight:600;}
+.tt-meeting-row{display:flex;align-items:center;gap:8px;padding:4px 0 4px 16px;flex-wrap:wrap;}
+.tt-meeting-label-input{background:var(--bg-panel-raised);border:1px solid var(--border);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 6px;width:110px;}
+.tt-remove-btn{background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;width:22px;height:22px;cursor:pointer;line-height:1;flex:none;}
+.tt-remove-btn:hover{border-color:var(--danger);color:var(--danger);}
+.tt-add-btn{background:none;border:1px dashed var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:5px 12px;cursor:pointer;margin:6px 0 0 16px;}
+.tt-add-btn:hover{border-color:var(--gold);color:var(--gold);}
 .tt-course-label{display:flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink);min-width:150px;}
 .tt-days{display:flex;gap:4px;}
 .tt-day-btn{width:26px;height:26px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10px;cursor:pointer;}

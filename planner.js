@@ -453,12 +453,17 @@ function ttTimeToMinutes(t){
   return parts[0]*60 + parts[1];
 }
 
+function getCourseMeetings(prog, id){
+  let t = prog.times[id];
+  if(!t){ return []; }
+  if(!Array.isArray(t)){ t = [t]; prog.times[id] = t; } // migrate old single-block format
+  return t;
+}
+
 function renderTimetable(nextSemCourses, prog){
-  const section = document.getElementById('ttSection');
   const label = document.getElementById('ttSemesterLabel');
   if(!nextSemCourses || nextSemCourses.length===0){
-    label.textContent = '';
-    document.getElementById('ttCourseInputs').innerHTML = '<div class="tt-empty-msg">Nothing left to schedule — every requirement is marked complete.</div>';
+    document.getElementById('ttCourseInputs').innerHTML = '<div class="tt-empty-msg">Nothing to schedule yet — check off courses in Currently Taking above, or complete requirements so the optimizer can suggest a next semester.</div>';
     document.getElementById('ttGrid').innerHTML = '';
     document.getElementById('ttConflicts').style.display = 'none';
     return;
@@ -468,29 +473,54 @@ function renderTimetable(nextSemCourses, prog){
 
   const inputsEl = document.getElementById('ttCourseInputs');
   inputsEl.innerHTML = '';
+
   nextSemCourses.forEach(c=>{
-    const t = prog.times[c.id] || {days:[], start:'', end:''};
-    const row = document.createElement('div');
-    row.className = 'tt-course-row';
-    row.innerHTML = `
-      <span class="tt-course-label"><span class="cat-dot" style="background:${catColor(c.cat)}"></span>${c.id}</span>
-      <div class="tt-days">
-        ${TT_DAYS.map(d=>`<button type="button" class="tt-day-btn ${t.days.includes(d)?'active':''}" data-day="${d}" data-course="${c.id}">${d}</button>`).join('')}
-      </div>
-      <input type="time" class="tt-time-input tt-start" data-course="${c.id}" value="${t.start}">
-      <span style="color:var(--muted-dim);font-size:11px;">–</span>
-      <input type="time" class="tt-time-input tt-end" data-course="${c.id}" value="${t.end}">
-    `;
-    inputsEl.appendChild(row);
+    const meetings = getCourseMeetings(prog, c.id);
+    if(meetings.length===0){ meetings.push({label:'', days:[], start:'', end:''}); }
+
+    const group = document.createElement('div');
+    group.className = 'tt-course-group';
+
+    const header = document.createElement('div');
+    header.className = 'tt-course-group-header';
+    header.innerHTML = `<span class="cat-dot" style="background:${catColor(c.cat)}"></span><span class="tt-course-code">${c.id}</span>`;
+    group.appendChild(header);
+
+    meetings.forEach((m, idx)=>{
+      const row = document.createElement('div');
+      row.className = 'tt-meeting-row';
+      row.innerHTML = `
+        <input type="text" class="tt-meeting-label-input" data-course="${c.id}" data-idx="${idx}" placeholder="Lecture / Lab / Rec." value="${m.label||''}">
+        <div class="tt-days">
+          ${TT_DAYS.map(d=>`<button type="button" class="tt-day-btn ${m.days.includes(d)?'active':''}" data-day="${d}" data-course="${c.id}" data-idx="${idx}">${d}</button>`).join('')}
+        </div>
+        <input type="time" class="tt-time-input tt-start" data-course="${c.id}" data-idx="${idx}" value="${m.start||''}">
+        <span style="color:var(--muted-dim);font-size:11px;">–</span>
+        <input type="time" class="tt-time-input tt-end" data-course="${c.id}" data-idx="${idx}" value="${m.end||''}">
+        ${meetings.length>1?`<button type="button" class="tt-remove-btn" data-course="${c.id}" data-idx="${idx}" title="Remove this meeting">×</button>`:''}
+      `;
+      group.appendChild(row);
+    });
+
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'tt-add-btn';
+    addBtn.setAttribute('data-course', c.id);
+    addBtn.textContent = '+ Add meeting (e.g. Lab or Recitation)';
+    group.appendChild(addBtn);
+
+    inputsEl.appendChild(group);
   });
 
   inputsEl.querySelectorAll('.tt-day-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const cid = btn.getAttribute('data-course');
+      const idx = parseInt(btn.getAttribute('data-idx'),10);
       const day = btn.getAttribute('data-day');
-      if(!prog.times[cid]){ prog.times[cid] = {days:[], start:'', end:''}; }
-      const idx = prog.times[cid].days.indexOf(day);
-      if(idx>=0){ prog.times[cid].days.splice(idx,1); } else { prog.times[cid].days.push(day); }
+      const meetings = getCourseMeetings(prog, cid);
+      const m = meetings[idx];
+      const dIdx = m.days.indexOf(day);
+      if(dIdx>=0){ m.days.splice(dIdx,1); } else { m.days.push(day); }
       btn.classList.toggle('active');
       saveState();
       renderTimetableGrid(nextSemCourses, prog);
@@ -499,11 +529,37 @@ function renderTimetable(nextSemCourses, prog){
   inputsEl.querySelectorAll('.tt-start, .tt-end').forEach(inp=>{
     inp.addEventListener('change', ()=>{
       const cid = inp.getAttribute('data-course');
-      if(!prog.times[cid]){ prog.times[cid] = {days:[], start:'', end:''}; }
-      if(inp.classList.contains('tt-start')){ prog.times[cid].start = inp.value; }
-      else { prog.times[cid].end = inp.value; }
+      const idx = parseInt(inp.getAttribute('data-idx'),10);
+      const meetings = getCourseMeetings(prog, cid);
+      if(inp.classList.contains('tt-start')){ meetings[idx].start = inp.value; }
+      else { meetings[idx].end = inp.value; }
       saveState();
       renderTimetableGrid(nextSemCourses, prog);
+    });
+  });
+  inputsEl.querySelectorAll('.tt-meeting-label-input').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const cid = inp.getAttribute('data-course');
+      const idx = parseInt(inp.getAttribute('data-idx'),10);
+      getCourseMeetings(prog, cid)[idx].label = inp.value;
+      saveState();
+    });
+  });
+  inputsEl.querySelectorAll('.tt-remove-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cid = btn.getAttribute('data-course');
+      const idx = parseInt(btn.getAttribute('data-idx'),10);
+      getCourseMeetings(prog, cid).splice(idx,1);
+      saveState();
+      renderTimetable(nextSemCourses, prog);
+    });
+  });
+  inputsEl.querySelectorAll('.tt-add-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const cid = btn.getAttribute('data-course');
+      getCourseMeetings(prog, cid).push({label:'', days:[], start:'', end:''});
+      saveState();
+      renderTimetable(nextSemCourses, prog);
     });
   });
 
@@ -527,32 +583,43 @@ function renderTimetableGrid(courses, prog){
 
   const conflictMsgs = [];
 
+  // flatten every course's meetings into a single list for grid placement
+  const allMeetings = [];
+  courses.forEach(c=>{
+    getCourseMeetings(prog, c.id).forEach(m=>{
+      if(m.days.length && m.start && m.end){ allMeetings.push({course:c, m}); }
+    });
+  });
+
   TT_DAYS.forEach(day=>{
     html += `<div class="tt-day-col" style="height:${gridHeight}px;">`;
-    const blocks = courses
-      .filter(c=>{ const t = prog.times[c.id]; return t && t.days.includes(day) && t.start && t.end; })
-      .map(c=>({course:c, t:prog.times[c.id], conflict:false}));
+    const blocks = allMeetings
+      .filter(x=>x.m.days.includes(day))
+      .map(x=>({course:x.course, m:x.m, conflict:false}));
 
     for(let i=0;i<blocks.length;i++){
       for(let j=i+1;j<blocks.length;j++){
-        const s1 = ttTimeToMinutes(blocks[i].t.start), e1 = ttTimeToMinutes(blocks[i].t.end);
-        const s2 = ttTimeToMinutes(blocks[j].t.start), e2 = ttTimeToMinutes(blocks[j].t.end);
+        const s1 = ttTimeToMinutes(blocks[i].m.start), e1 = ttTimeToMinutes(blocks[i].m.end);
+        const s2 = ttTimeToMinutes(blocks[j].m.start), e2 = ttTimeToMinutes(blocks[j].m.end);
         if(s1<e2 && s2<e1){
           blocks[i].conflict = true; blocks[j].conflict = true;
-          conflictMsgs.push(`${blocks[i].course.id} ↔ ${blocks[j].course.id} on ${TT_DAY_LABELS[day]}`);
+          const label1 = blocks[i].course.id + (blocks[i].m.label?` (${blocks[i].m.label})`:'');
+          const label2 = blocks[j].course.id + (blocks[j].m.label?` (${blocks[j].m.label})`:'');
+          conflictMsgs.push(`${label1} ↔ ${label2} on ${TT_DAY_LABELS[day]}`);
         }
       }
     }
 
     blocks.forEach(b=>{
-      const startMin = ttTimeToMinutes(b.t.start) - TT_START_HOUR*60;
-      const endMin = ttTimeToMinutes(b.t.end) - TT_START_HOUR*60;
+      const startMin = ttTimeToMinutes(b.m.start) - TT_START_HOUR*60;
+      const endMin = ttTimeToMinutes(b.m.end) - TT_START_HOUR*60;
       if(endMin<=startMin) return;
       const top = (startMin/60)*TT_PX_PER_HOUR;
       const height = Math.max(((endMin-startMin)/60)*TT_PX_PER_HOUR, 18);
       const color = catColor(b.course.cat);
+      const sub = b.m.label ? b.m.label : (b.course.id);
       html += `<div class="tt-block ${b.conflict?'conflict':''}" style="top:${top}px;height:${height}px;background:color-mix(in srgb, ${color} 18%, var(--bg-panel));border-color:${color};">
-        <b>${b.course.id}</b><br>${b.t.start}–${b.t.end}
+        <b>${b.course.id}</b>${b.m.label?' <i>('+b.m.label+')</i>':''}<br>${b.m.start}–${b.m.end}
       </div>`;
     });
     html += '</div>';
@@ -701,21 +768,24 @@ function generateICS(courses, prog, termDates){
   const untilStr = termDates.classesEnd.replace(/-/g,'') + 'T235900Z';
 
   courses.forEach(c=>{
-    const t = prog.times[c.id];
-    if(!t || !t.days || t.days.length===0 || !t.start || !t.end) return;
-    const byday = t.days.map(d=>ICS_DAY_MAP[d]).join(',');
-    const earliestDay = t.days.slice().sort((a,b)=>JS_WEEKDAY[a]-JS_WEEKDAY[b])[0];
-    const dtstartDate = nextOccurrence(termDates.classesStart, JS_WEEKDAY[earliestDay]);
-    const [sh,sm] = t.start.split(':').map(Number);
-    const [eh,em] = t.end.split(':').map(Number);
-    lines.push('BEGIN:VEVENT');
-    lines.push('UID:'+c.id+'-'+now.getTime()+'@smartcourseplanner');
-    lines.push('DTSTAMP:'+dtstamp);
-    lines.push('DTSTART:'+icsDateTime(dtstartDate,sh,sm));
-    lines.push('DTEND:'+icsDateTime(dtstartDate,eh,em));
-    lines.push('RRULE:FREQ=WEEKLY;BYDAY='+byday+';UNTIL='+untilStr);
-    lines.push('SUMMARY:'+c.id+' \u2014 '+c.name.replace(/,/g,''));
-    lines.push('END:VEVENT');
+    const meetings = getCourseMeetings(prog, c.id);
+    meetings.forEach((t, mi)=>{
+      if(!t || !t.days || t.days.length===0 || !t.start || !t.end) return;
+      const byday = t.days.map(d=>ICS_DAY_MAP[d]).join(',');
+      const earliestDay = t.days.slice().sort((a,b)=>JS_WEEKDAY[a]-JS_WEEKDAY[b])[0];
+      const dtstartDate = nextOccurrence(termDates.classesStart, JS_WEEKDAY[earliestDay]);
+      const [sh,sm] = t.start.split(':').map(Number);
+      const [eh,em] = t.end.split(':').map(Number);
+      const summary = c.id + (t.label?(' ('+t.label+')'):'') + ' \u2014 ' + c.name.replace(/,/g,'');
+      lines.push('BEGIN:VEVENT');
+      lines.push('UID:'+c.id+'-'+mi+'-'+now.getTime()+'@smartcourseplanner');
+      lines.push('DTSTAMP:'+dtstamp);
+      lines.push('DTSTART:'+icsDateTime(dtstartDate,sh,sm));
+      lines.push('DTEND:'+icsDateTime(dtstartDate,eh,em));
+      lines.push('RRULE:FREQ=WEEKLY;BYDAY='+byday+';UNTIL='+untilStr);
+      lines.push('SUMMARY:'+summary);
+      lines.push('END:VEVENT');
+    });
   });
 
   function addAllDay(name, dateStr){
