@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Smart Course Planner — Purdue Engineering Degree Path Optimization</title>
 <meta name="description" content="A constraint-based degree scheduler for six Purdue engineering majors, built to explore optimization and scheduling theory as an academic planning problem.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta property="og:title" content="Smart Course Planner — Purdue Engineering Degree Path Optimization">
+<meta property="og:description" content="A constraint-based degree scheduler for six Purdue engineering majors — CPM critical path analysis, provable schedule optimality, and a live timetable/calendar export.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Smart Course Planner — Purdue Engineering Degree Path Optimization">
+<meta name="twitter:description" content="A constraint-based degree scheduler for six Purdue engineering majors, built around real operations-research techniques.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
@@ -15,6 +22,7 @@
   <div class="wrap">
     <a class="brand" href="index.html"><b>SCP</b> / Smart Course Planner</a>
     <div class="nav-links">
+      <a href="#about">About</a>
       <a href="#problem">Problem</a>
       <a href="#model">Model</a>
       <a href="#complexity">Complexity</a>
@@ -39,6 +47,17 @@
     <div class="hero-meta-item"><div class="n">O(n²)</div><div class="l">Greedy scheduling pass</div></div>
   </div>
 </div>
+
+<section id="about">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-num">00 — Why I Built This</div>
+      <div class="section-title">Two ordinary frustrations, one system.</div>
+      <p class="section-body">I'm applying to Purdue as a transfer student out of First-Year Engineering, and this project came out of two very ordinary frustrations. First, just checking my own course plan meant logging into MyPurdue's DegreeWorks — every time, through a portal, with no quick way to just glance at where I stood. Second, and more specific to transferring out of FYE: I had to choose a major without any real way to compare what each one actually required, or how the paths differed in length and structure. Industrial Engineering is what I'm most drawn to, so it's the major I built out first and in the most depth — the other five exist so I could compare paths side by side, not because I was undecided about IE itself.</p>
+      <p class="section-body" style="margin-top:14px;">Building it taught me two things I'd only had in the abstract before: how to take operations-research concepts I'd read about — critical path method, greedy scheduling, combinatorial relaxation bounds — and apply them to a problem that was actually mine, with real prerequisite data and real constraints. And how to take a genuinely messy set of requirements — six different majors, a live weekly timetable, a real academic calendar, GPA projection — and design them as one coherent system instead of six separate one-off scripts.</p>
+    </div>
+  </div>
+</section>
 
 <section id="problem">
   <div class="wrap">

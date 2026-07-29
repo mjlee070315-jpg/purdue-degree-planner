@@ -1,5 +1,12 @@
 # Smart Course Planner — Purdue Engineering Degree Path Optimizer
 
+![Status](https://img.shields.io/badge/status-active-7FA97F)
+![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%2F%20HTML%20%2F%20CSS-CFB991)
+![Majors](https://img.shields.io/badge/majors%20modeled-6-CFB991)
+![License](https://img.shields.io/badge/license-MIT-948D78)
+
+**Live demo:** https://mjlee070315-jpg.github.io/purdue-degree-planner/
+
 A constraint-based degree scheduler covering six Purdue engineering
 curricula: Industrial, Mechanical, Electrical, Civil, and Chemical
 Engineering, plus Computer Science. Instead of manually tracking
@@ -7,7 +14,44 @@ prerequisites and credit caps every semester, the planner models each
 degree as a dependency graph, solves for the fastest feasible path to
 graduation, and mathematically verifies how close that path is to optimal.
 
-**Pages:** `index.html` (project overview) · `planner.html` (the tool)
+## Why I built this
+
+I'm applying to Purdue as a transfer student out of First-Year Engineering.
+Checking my own course plan meant logging into MyPurdue's DegreeWorks every
+time with no quick way to just glance at where I stood, and — more
+specific to transferring out of FYE — I had to choose a major without any
+real way to compare what each one actually required. Industrial
+Engineering is what I'm most drawn to, so it's the major built out first
+and in the most depth; the other five exist so I could compare paths side
+by side. Building it was a chance to apply operations-research concepts
+I'd only read about — critical path method, greedy scheduling,
+combinatorial relaxation bounds — to a problem that was actually mine, and
+to design a genuinely messy set of requirements (six majors, a live
+timetable, a real academic calendar) as one coherent system.
+
+## Screenshots
+
+_Add screenshots here before sharing this repo — e.g. `docs/planner.png`
+(the roadmap + CPM diagram) and `docs/index.png` (the landing page).
+Easiest way: open the live demo, `Cmd+Shift+4` (Mac) or the Windows
+Snipping Tool, save into a `docs/` folder, then:_
+
+```markdown
+![Planner](docs/planner.png)
+![Landing page](docs/index.png)
+```
+
+## Skills demonstrated
+
+Operations research (CPM, greedy scheduling, combinatorial bounds) ·
+graph algorithms (topological sort, longest-path) · data modeling (6
+independent curricula, 245 courses) · frontend engineering (vanilla
+JS/CSS, no framework) · SVG data visualization · date/calendar math ·
+iCalendar (RFC 5545) generation · UX design for a technical audience
+
+## Pages
+
+`index.html` (project overview) · `planner.html` (the tool)
 
 ## The model
 
@@ -41,6 +85,19 @@ NP-hard at this scale, but the greedy result is guaranteed within that gap
 of the true optimum. Run against all six majors at an 18-credit cap: IE,
 ME, ChemE, and CE come back provably optimal; ECE and CS land one semester
 above the bound.
+
+## Critical Path Method (CPM) network diagram
+
+Beyond the greedy roadmap, the planner runs a full CPM analysis on each
+major's complete course graph — real forward-pass Early Start/Finish and
+backward-pass Late Start/Finish for every course, with slack computed as
+`LS − ES`. Courses with zero slack form the critical path and are rendered
+as a network diagram (nodes = courses, positioned left-to-right by Early
+Start; edges = prerequisites; critical path highlighted in gold). CPM
+assumes unlimited parallel course-taking, so its "duration" is a genuinely
+different — and looser — relaxation than the credit-capped roadmap:
+comparing the two is itself a small demonstration of relaxation-vs-reality
+thinking in operations research.
 
 ## Currently taking & GPA projection
 
@@ -78,10 +135,12 @@ or Outlook.
 ## Project structure
 
 ```
-index.html      – landing page / project write-up (problem, model, complexity, features)
-planner.html    – the interactive planner (major selector, optimizer, GPA calc)
+index.html      – landing page / project write-up (about, problem, model, complexity, features)
+planner.html    – the interactive planner (major selector, optimizer, CPM diagram, GPA calc)
 style.css       – shared design system
 planner.js      – course data for all 6 majors + scheduling engine + rendering
+favicon.svg     – site icon
+LICENSE         – MIT license
 ```
 
 No build step, no dependencies — plain HTML/CSS/JS. Storage auto-detects
