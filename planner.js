@@ -455,8 +455,12 @@ function ttTimeToMinutes(t){
 
 function getCourseMeetings(prog, id){
   let t = prog.times[id];
-  if(!t){ return []; }
-  if(!Array.isArray(t)){ t = [t]; prog.times[id] = t; } // migrate old single-block format
+  if(!t){
+    t = [];
+    prog.times[id] = t; // must persist the reference so later pushes/edits actually stick
+  } else if(!Array.isArray(t)){
+    t = [t]; prog.times[id] = t; // migrate old single-block format
+  }
   return t;
 }
 
