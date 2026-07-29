@@ -936,11 +936,19 @@ function render(){
     });
   });
 
-  // ---- weekly timetable + semester calendar for the next scheduled semester ----
-  if(schedule.length>0){
+  // ---- weekly timetable + semester calendar ----
+  // Prefer the student's actual Currently Taking courses; fall back to the
+  // optimizer's next suggested semester if nothing is marked in-progress yet.
+  const takingCourses = courses.filter(c=>prog.inprogress[c.id]);
+  if(takingCourses.length>0){
+    currentNextSemCourses = takingCourses;
+    document.getElementById('ttSemesterLabel').textContent = termLabel(maxCompletedTerm) + ' · your courses';
+    renderTimetable(currentNextSemCourses, prog);
+    renderCalendar(maxCompletedTerm);
+  } else if(schedule.length>0){
     const absTermNext = maxCompletedTerm + schedule[0].term;
-    document.getElementById('ttSemesterLabel').textContent = termLabel(absTermNext);
     currentNextSemCourses = schedule[0].courses;
+    document.getElementById('ttSemesterLabel').textContent = termLabel(absTermNext) + ' · suggested';
     renderTimetable(currentNextSemCourses, prog);
     renderCalendar(absTermNext);
   } else {
