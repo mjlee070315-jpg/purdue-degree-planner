@@ -103,6 +103,7 @@
       </div>
     </div>
     <p class="section-body" style="margin-top:26px;">This is a classic <b>combinatorial relaxation bound</b>: instead of solving the hard problem exactly, solve two easy relaxations of it and use whichever gives the stronger (larger) bound. Run against all six majors' full 8-semester plans at an 18-credit cap, the greedy scheduler matches this lower bound exactly for IE, ME, ChemE, and CE — <b>provably optimal</b>, zero semesters to spare. For ECE and CS it lands one semester above the bound — a small, honestly-reported gap, since closing it exactly would require exponential search. The planner shows this live: open any major and the optimizer panel displays the current gap (or the ✓ when it's zero).</p>
+    <p class="section-body" style="margin-top:16px;">The planner also runs a full <b>Critical Path Method (CPM)</b> analysis on each major — real forward/backward-pass Early Start, Early Finish, Late Start, Late Finish, and slack for every course, rendered as an interactive network diagram with the zero-slack critical path highlighted. CPM assumes unlimited parallel course-taking, so it's a genuinely different (and looser) relaxation than the credit-capped roadmap: comparing the two side by side — theoretical fastest path vs. realistic, resource-constrained path — is itself the kind of relaxation-vs-reality comparison operations research is built on.</p>
   </div>
 </section>
 

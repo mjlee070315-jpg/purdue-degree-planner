@@ -131,6 +131,15 @@
     <div class="legend-item"><span class="badge opt">Optimization</span>The OR / optimization course (IE only)</div>
   </div>
 
+  <div class="cpm-wrap">
+    <div class="cpm-head">
+      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4" cy="10" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="10" cy="16" r="2"/><circle cx="16" cy="10" r="2"/><path d="M6 10h8M5.4 8.6l3.2-3.2M5.4 11.4l3.2 3.2M11.4 6.8l3.2 3.2M11.4 13.2l3.2-3.2"/></svg>Critical Path Network (CPM)</h2>
+      <span class="cpm-badge" id="cpmBadge"></span>
+    </div>
+    <div class="cpm-note">A real Critical Path Method analysis of the full degree — Early Start/Finish and Late Start/Finish computed for every course, assuming <i>unlimited</i> parallel course-taking (no credit cap). Courses with zero slack (gold, thick edges) form the critical path: delay any one of them and graduation slips. This differs from the credit-capped roadmap below, which is the realistic, resource-constrained version of the same problem.</div>
+    <div class="cpm-scroll"><div id="cpmDiagram"></div></div>
+  </div>
+
   <div class="roadmap-label">
     <svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 10h3l2-5 4 10 2-5h3"/></svg>
     Roadmap — remaining semesters after what you're currently taking

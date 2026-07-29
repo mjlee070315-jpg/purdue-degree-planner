@@ -920,6 +920,142 @@ function renderRequirementProgress(courses, prog){
   });
 }
 
+// ============================================================
+// Critical Path Method (CPM) — real ES/EF/LS/LF/slack analysis
+// ============================================================
+function computeCPM(courses){
+  const byId = {};
+  courses.forEach(c=>{ byId[c.id] = c; });
+  const ES = {}, EF = {};
+
+  function calcEF(id){
+    if(EF[id]!==undefined) return EF[id];
+    calcES(id);
+    return EF[id];
+  }
+  function calcES(id){
+    if(ES[id]!==undefined) return ES[id];
+    const c = byId[id];
+    ES[id] = c.prereq.length===0 ? 0 : Math.max(...c.prereq.map(p=>calcEF(p)));
+    EF[id] = ES[id] + 1;
+    return ES[id];
+  }
+  courses.forEach(c=>calcES(c.id));
+  const duration = Math.max(0, ...Object.values(EF));
+
+  const dependentsOf = {};
+  courses.forEach(c=>{
+    c.prereq.forEach(p=>{
+      if(!dependentsOf[p]) dependentsOf[p] = [];
+      dependentsOf[p].push(c.id);
+    });
+  });
+
+  const LF = {}, LS = {};
+  function calcLS(id){
+    if(LS[id]!==undefined) return LS[id];
+    calcLF(id);
+    return LS[id];
+  }
+  function calcLF(id){
+    if(LF[id]!==undefined) return LF[id];
+    const deps = dependentsOf[id] || [];
+    LF[id] = deps.length===0 ? duration : Math.min(...deps.map(d=>calcLS(d)));
+    LS[id] = LF[id] - 1;
+    return LF[id];
+  }
+  courses.forEach(c=>calcLF(c.id));
+
+  const slack = {};
+  let criticalCount = 0;
+  courses.forEach(c=>{
+    slack[c.id] = LS[c.id] - ES[c.id];
+    if(slack[c.id]===0) criticalCount++;
+  });
+
+  return {ES, EF, LS, LF, slack, duration, criticalCount};
+}
+
+const CPM_COL_W = 176, CPM_ROW_H = 56, CPM_NODE_W = 152, CPM_NODE_H = 40, CPM_PAD = 24;
+
+function renderCPMDiagram(courses){
+  const cpm = computeCPM(courses);
+  const badge = document.getElementById('cpmBadge');
+  badge.textContent = cpm.duration + ' steps · ' + cpm.criticalCount + ' of ' + courses.length + ' courses critical';
+
+  // group into columns by Early Start level
+  const levels = {};
+  courses.forEach(c=>{
+    const lvl = cpm.ES[c.id];
+    if(!levels[lvl]) levels[lvl] = [];
+    levels[lvl].push(c);
+  });
+  Object.values(levels).forEach(arr=>arr.sort((a,b)=> (a.cat===b.cat ? a.id.localeCompare(b.id) : a.cat.localeCompare(b.cat))));
+
+  const pos = {}; // id -> {x,y} (center of node)
+  let maxRows = 1;
+  for(let lvl=0; lvl<=cpm.duration; lvl++){
+    const arr = levels[lvl] || [];
+    maxRows = Math.max(maxRows, arr.length);
+    arr.forEach((c, i)=>{
+      pos[c.id] = {
+        x: CPM_PAD + lvl*CPM_COL_W + CPM_NODE_W/2,
+        y: CPM_PAD + i*CPM_ROW_H + CPM_NODE_H/2
+      };
+    });
+  }
+
+  const svgW = CPM_PAD*2 + (cpm.duration+1)*CPM_COL_W;
+  const svgH = CPM_PAD*2 + maxRows*CPM_ROW_H;
+
+  let edges = '';
+  courses.forEach(c=>{
+    c.prereq.forEach(p=>{
+      if(!pos[p] || !pos[c.id]) return;
+      const isCritical = cpm.slack[p]===0 && cpm.slack[c.id]===0;
+      const p1 = pos[p], p2 = pos[c.id];
+      const x1 = p1.x + CPM_NODE_W/2, y1 = p1.y;
+      const x2 = p2.x - CPM_NODE_W/2, y2 = p2.y;
+      const mx = (x1+x2)/2;
+      edges += `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${isCritical?'var(--gold-bright)':'var(--border)'}" stroke-width="${isCritical?2.2:1}" marker-end="url(#cpmArrow${isCritical?'Crit':''})"/>`;
+    });
+  });
+
+  let nodes = '';
+  courses.forEach(c=>{
+    const p = pos[c.id];
+    if(!p) return;
+    const critical = cpm.slack[c.id]===0;
+    const color = catColor(c.cat);
+    const x = p.x - CPM_NODE_W/2, y = p.y - CPM_NODE_H/2;
+    nodes += `
+      <g class="cpm-node">
+        <rect x="${x}" y="${y}" width="${CPM_NODE_W}" height="${CPM_NODE_H}" rx="3"
+          fill="var(--bg-panel)" stroke="${critical?'var(--gold-bright)':color}" stroke-width="${critical?2:1.3}"/>
+        <rect x="${x}" y="${y}" width="4" height="${CPM_NODE_H}" fill="${color}"/>
+        <text x="${x+11}" y="${y+16}" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--ink)" font-weight="600">${c.id}</text>
+        <text x="${x+11}" y="${y+29}" font-family="IBM Plex Mono, monospace" font-size="8.5" fill="var(--muted)">slack ${cpm.slack[c.id]} \u00b7 ${c.credits}cr</text>
+        <title>${c.name} \u2014 ES ${cpm.ES[c.id]}, EF ${cpm.EF[c.id]}, LS ${cpm.LS[c.id]}, LF ${cpm.LF[c.id]}, slack ${cpm.slack[c.id]}</title>
+      </g>`;
+  });
+
+  const svg = `
+    <svg width="${svgW}" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="cpmArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 Z" fill="var(--border)"/>
+        </marker>
+        <marker id="cpmArrowCrit" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L8,4 L0,8 Z" fill="var(--gold-bright)"/>
+        </marker>
+      </defs>
+      ${edges}
+      ${nodes}
+    </svg>`;
+
+  document.getElementById('cpmDiagram').innerHTML = svg;
+}
+
 function render(){
   renderMajorSelector();
 
@@ -960,6 +1096,7 @@ function render(){
 
   renderCurrentlyTaking(courses, prog);
   renderRequirementProgress(courses, prog);
+  renderCPMDiagram(courses);
 
   // ---- optimality verification (lower bound technique) ----
   const remainingCourses = courses.filter(c=>!prog.completed[c.id] && !prog.inprogress[c.id]);
