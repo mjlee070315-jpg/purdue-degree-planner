@@ -35,11 +35,11 @@ line; essays/portfolios can take the long version).
 
 ## Supplemental essay opener (if a prompt fits "describe a project")
 
-> I'm applying to Purdue as a transfer student out of First-Year
-> Engineering, and I built a web app to solve two problems I actually had:
-> checking my own course plan meant logging into a portal every time, and
-> choosing a major meant comparing six different curricula with no good way
-> to see them side by side. So I modeled each major as a dependency graph —
+> As a First-Year Engineering student at Purdue applying to transfer, I
+> built a web app to solve two problems I actually had: checking my own
+> course plan meant logging into a portal every time, and choosing a major
+> meant comparing six different curricula with no good way to see them side
+> by side. So I modeled each major as a dependency graph —
 > prerequisites as edges, courses as nodes — and applied a scheduling
 > algorithm I'd only read about in the context of operations research:
 > greedy topological sorting, checked against a combinatorial lower bound

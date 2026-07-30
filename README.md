@@ -16,7 +16,8 @@ graduation, and mathematically verifies how close that path is to optimal.
 
 ## Why I built this
 
-I'm applying to Purdue as a transfer student out of First-Year Engineering.
+I'm a First-Year Engineering student at Purdue, applying to transfer to
+another university.
 Checking my own course plan meant logging into MyPurdue's DegreeWorks every
 time with no quick way to just glance at where I stood, and — more
 specific to transferring out of FYE — I had to choose a major without any

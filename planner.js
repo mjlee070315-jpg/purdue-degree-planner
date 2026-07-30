@@ -417,6 +417,15 @@ function catColor(cat){
   return {fye:'var(--gold)', major:'var(--ie)', support:'var(--science)', elective:'var(--elective)'}[cat] || 'var(--muted)';
 }
 
+// A wider, hashed palette so courses on the timetable are visually distinct
+// from one another, not just grouped into 4 category colors.
+const TT_PALETTE = ['#CFB991','#7C9AAB','#7FA97F','#B5502F','#9A7FC7','#D98E4A','#5FA8A0','#C77DA6','#8B9E4A','#6E8FD9'];
+function ttCourseColor(courseId){
+  let hash = 0;
+  for(let i=0;i<courseId.length;i++){ hash = (hash*31 + courseId.charCodeAt(i)) >>> 0; }
+  return TT_PALETTE[hash % TT_PALETTE.length];
+}
+
 function computeGPA(mode){
   const prog = getProgress();
   const courses = getCourses();
@@ -620,7 +629,7 @@ function renderTimetableGrid(courses, prog){
       if(endMin<=startMin) return;
       const top = (startMin/60)*TT_PX_PER_HOUR;
       const height = Math.max(((endMin-startMin)/60)*TT_PX_PER_HOUR, 18);
-      const color = catColor(b.course.cat);
+      const color = ttCourseColor(b.course.id);
       const sub = b.m.label ? b.m.label : (b.course.id);
       html += `<div class="tt-block ${b.conflict?'conflict':''}" style="top:${top}px;height:${height}px;background:color-mix(in srgb, ${color} 18%, var(--bg-panel));border-color:${color};">
         <b>${b.course.id}</b>${b.m.label?' <i>('+b.m.label+')</i>':''}<br>${b.m.start}–${b.m.end}
