@@ -164,6 +164,14 @@ Elective and track slots (General Education, Technical Electives, CS Track
 Requirements, etc.) are shown as generic placeholders — swap in specific
 course titles once chosen.
 
+## Analytics
+
+The site uses [GoatCounter](https://www.goatcounter.com/) for lightweight,
+privacy-friendly visit tracking (no cookies, no consent banner needed) —
+chosen over Google Analytics and Cloudflare Web Analytics specifically
+because it works cleanly on a `github.io` subdomain without owning a
+custom domain.
+
 ## Deploying to GitHub Pages
 
 1. Create a new repository on GitHub.
