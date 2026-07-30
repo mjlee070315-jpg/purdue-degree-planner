@@ -64,6 +64,11 @@ a{color:inherit;}
   padding:7px 14px;
 }
 .nav-links a.cta:hover{background:var(--gold);color:var(--bg);}
+@media(max-width:640px){
+  .nav-links a:not(.cta){display:none;}
+  .site-nav .wrap{padding:0 16px;}
+  .brand{font-size:11.5px;}
+}
 
 /* ---- Title block (shared header motif) ---- */
 .titleblock{
@@ -357,6 +362,23 @@ section{padding:56px 0;border-top:1px solid var(--border);}
 select.predicted-grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid var(--border);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:3px 6px;}
 .current-empty-msg{font-size:12px;color:var(--muted-dim);padding:16px 0;}
 .roadmap-label{display:flex;align-items:center;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ink);margin-bottom:12px;}
+
+/* ---- Sensitivity analysis ---- */
+.sens-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:22px;}
+.sens-head h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0 0 6px;display:flex;align-items:center;}
+.sens-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;max-width:720px;}
+.sens-elbow{font-size:11.5px;color:var(--gold-bright);margin-top:10px;font-family:'IBM Plex Mono',monospace;}
+#sensChart{max-width:560px;}
+
+/* ---- Major comparison ---- */
+.compare-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:22px;}
+.compare-head h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0 0 6px;display:flex;align-items:center;}
+.compare-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;max-width:720px;}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;}
+.compare-table th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border);}
+.compare-table td{padding:9px 10px;border-bottom:1px solid rgba(207,185,145,0.06);color:var(--ink);}
+.compare-row-active{background:rgba(207,185,145,0.06);}
+.compare-row-active td:first-child{color:var(--gold-bright);font-weight:600;}
 
 /* ---- CPM network diagram ---- */
 .cpm-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:24px;}

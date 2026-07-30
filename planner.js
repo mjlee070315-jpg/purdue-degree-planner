@@ -1065,6 +1065,169 @@ function renderCPMDiagram(courses){
   document.getElementById('cpmDiagram').innerHTML = svg;
 }
 
+// ============================================================
+// Sensitivity Analysis — semesters-to-graduation vs. credit cap
+// ============================================================
+const SENS_CAPS = [12,13,14,15,16,17,18,19];
+
+function renderSensitivityChart(courses, satisfiedIds, currentCap){
+  const el = document.getElementById('sensChart');
+  const results = SENS_CAPS.map(cap => buildSchedule(satisfiedIds, cap, courses).length);
+  const maxSem = Math.max(...results);
+  const chartH = 160, chartW = 520, barGap = 10;
+  const barW = (chartW - barGap*(SENS_CAPS.length-1)) / SENS_CAPS.length;
+
+  let bars = '';
+  SENS_CAPS.forEach((cap, i)=>{
+    const sem = results[i];
+    const h = maxSem>0 ? (sem/maxSem)*chartH : 0;
+    const x = i*(barW+barGap);
+    const y = chartH - h;
+    const isCurrent = cap === currentCap;
+    const isElbow = i>0 && results[i-1]===sem && (i===SENS_CAPS.length-1 || results[Math.max(0,i-2)] !== sem || i===1);
+    const color = isCurrent ? 'var(--gold-bright)' : 'var(--ie)';
+    bars += `
+      <g>
+        <rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${color}" opacity="${isCurrent?1:0.55}" rx="2"/>
+        <text x="${x+barW/2}" y="${y-6}" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--ink)" text-anchor="middle">${sem}</text>
+        <text x="${x+barW/2}" y="${chartH+18}" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--muted)" text-anchor="middle">${cap}</text>
+      </g>`;
+  });
+
+  el.innerHTML = `<svg width="100%" viewBox="0 0 ${chartW} ${chartH+34}" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
+
+  // find the elbow: first cap where increasing further stops reducing semesters
+  let elbowCap = SENS_CAPS[SENS_CAPS.length-1];
+  for(let i=1;i<results.length;i++){
+    if(results[i]===results[results.length-1]){ elbowCap = SENS_CAPS[i]; break; }
+  }
+  document.getElementById('sensNote').textContent =
+    `Diminishing returns kick in around ${elbowCap} credits/semester — raising the cap further doesn't shorten the plan any more (at this student's current progress).`;
+}
+
+// ============================================================
+// Major Comparison — all 6 majors, compared from a fresh start
+// ============================================================
+function renderMajorComparison(currentCap){
+  const tbody = document.getElementById('majorCompareBody');
+  const rows = Object.keys(PROGRAMS).map(key=>{
+    const courses = PROGRAMS[key].courses;
+    const total = courses.reduce((s,c)=>s+c.credits,0);
+    const sched = buildSchedule([], currentCap, courses);
+    const lb = lowerBoundSemesters(courses, currentCap);
+    const cpm = computeCPM(courses);
+    const optimal = sched.length <= lb;
+    return {key, total, semesters: sched.length, lb, optimal, cpmSteps: cpm.duration};
+  });
+
+  tbody.innerHTML = rows.map(r=>`
+    <tr class="${r.key===state.major?'compare-row-active':''}">
+      <td>${PROGRAMS[r.key].label.split(',')[0]}</td>
+      <td>${r.total} cr</td>
+      <td>${r.semesters}</td>
+      <td>${r.lb}</td>
+      <td>${r.optimal ? '<span class="opt-badge opt-good" style="padding:2px 8px;">✓ optimal</span>' : `<span class="opt-badge opt-gap" style="padding:2px 8px;">gap ${r.semesters-r.lb}</span>`}</td>
+      <td>${r.cpmSteps}</td>
+    </tr>
+  `).join('');
+}
+
+// ============================================================
+// Exact Optimal Solver — bounded branch & bound (on demand)
+// ============================================================
+function exactOptimalSemesters(courses, satisfiedIds, cap, timeBudgetMs){
+  const startTime = Date.now();
+  const satisfiedSet = new Set(satisfiedIds);
+  const remaining = courses.filter(c=>!satisfiedSet.has(c.id));
+  if(remaining.length===0){ return {status:'exact', semesters:0, nodes:0, improvedOnGreedy:false}; }
+
+  const greedySchedule = buildSchedule(satisfiedIds, cap, courses);
+  let bestFound = greedySchedule.length;
+  let nodesVisited = 0;
+  let timedOut = false;
+  let exhaustive = true;
+
+  function solve(completedSet, semCount){
+    nodesVisited++;
+    if(Date.now()-startTime > timeBudgetMs){ timedOut = true; return Infinity; }
+    if(semCount >= bestFound) return Infinity;
+
+    const remainingNow = remaining.filter(c=>!completedSet.has(c.id));
+    if(remainingNow.length===0){
+      if(semCount < bestFound) bestFound = semCount;
+      return semCount;
+    }
+
+    const lb = lowerBoundSemesters(remainingNow, cap);
+    if(semCount + lb >= bestFound) return Infinity;
+
+    const eligible = remainingNow.filter(c=>c.prereq.every(p=>completedSet.has(p) || satisfiedSet.has(p)));
+    if(eligible.length===0) return Infinity;
+
+    let candidateSubsets = [];
+    if(eligible.length <= 15){
+      const n = eligible.length;
+      for(let mask=1; mask<(1<<n); mask++){
+        let sum=0, subset=[];
+        for(let i=0;i<n;i++){ if(mask & (1<<i)){ sum+=eligible[i].credits; subset.push(eligible[i]); } }
+        if(sum<=cap){ candidateSubsets.push(subset); }
+      }
+      candidateSubsets.sort((a,b)=>b.length-a.length);
+    } else {
+      exhaustive = false;
+      const memo = longestPaths(remainingNow);
+      const sorted = eligible.slice().sort((a,b)=>memo[b.id]-memo[a.id]);
+      let sum=0, subset=[];
+      for(const c of sorted){ if(sum+c.credits<=cap){ subset.push(c); sum+=c.credits; } }
+      candidateSubsets = [subset];
+    }
+
+    let localBest = Infinity;
+    for(const subset of candidateSubsets){
+      if(Date.now()-startTime > timeBudgetMs){ timedOut = true; break; }
+      const newCompleted = new Set(completedSet);
+      subset.forEach(c=>newCompleted.add(c.id));
+      const result = solve(newCompleted, semCount+1);
+      if(result < localBest) localBest = result;
+    }
+    return localBest;
+  }
+
+  solve(new Set(satisfiedIds), 0);
+  return {
+    status: (timedOut || !exhaustive) ? 'incomplete' : 'exact',
+    semesters: bestFound,
+    nodes: nodesVisited,
+    improvedOnGreedy: bestFound < greedySchedule.length,
+    greedySemesters: greedySchedule.length
+  };
+}
+
+function runExactSolver(){
+  const courses = getCourses();
+  const prog = getProgress();
+  const cap = parseInt(document.getElementById('creditCap').value,10);
+  const completedIds = Object.keys(prog.completed).filter(id=>prog.completed[id]);
+  const inprogressIds = Object.keys(prog.inprogress).filter(id=>prog.inprogress[id]);
+  const satisfiedIds = completedIds.concat(inprogressIds);
+
+  const resultEl = document.getElementById('ilpResult');
+  resultEl.innerHTML = '<span class="opt-badge" style="color:var(--muted);border-color:var(--muted-dim);">Searching\u2026 (branch & bound, up to 2s)</span>';
+
+  setTimeout(()=>{
+    const r = exactOptimalSemesters(courses, satisfiedIds, cap, 2000);
+    let html;
+    if(r.status==='exact'){
+      html = `<span class="opt-badge opt-good">\u2713 Exhaustively verified: ${r.semesters} semester${r.semesters===1?'':'s'} is truly optimal (${r.nodes.toLocaleString()} states explored, full search completed)</span>`;
+    } else if(r.improvedOnGreedy){
+      html = `<span class="opt-badge opt-gap">Search found a <b>better</b> schedule than the greedy heuristic: ${r.semesters} vs. ${r.greedySemesters} semesters (${r.nodes.toLocaleString()} states explored, search incomplete — true optimum may be even lower). The greedy scheduler used elsewhere on this page is a heuristic and isn't guaranteed optimal \u2014 this is a real example of it falling short.</span>`;
+    } else {
+      html = `<span class="opt-badge" style="color:var(--muted);border-color:var(--muted-dim);">Search incomplete (search space too large to fully verify within the time budget) \u2014 best found: ${r.semesters} semesters, matching the greedy result. Consistent with, but not proof of, optimality.</span>`;
+    }
+    resultEl.innerHTML = html;
+  }, 30);
+}
+
 function render(){
   renderMajorSelector();
 
@@ -1119,6 +1282,9 @@ function render(){
   } else {
     badge.innerHTML = '<span class="opt-badge opt-gap">Greedy: '+schedule.length+' sem · Lower bound: '+lb+' sem · gap: '+gap+' — true optimum is NP-hard to compute exactly at this scale, but the greedy result is within '+gap+' semester'+(gap===1?'':'s')+' of the best any scheduler could theoretically do</span>';
   }
+
+  renderSensitivityChart(courses, satisfiedIds, maxCredits);
+  renderMajorComparison(maxCredits);
 
   const grid = document.getElementById('semgrid');
   grid.innerHTML = '';
@@ -1218,6 +1384,7 @@ function render(){
 
 function initPlanner(){
   document.getElementById('creditCap').addEventListener('input', render);
+  document.getElementById('runIlpBtn').addEventListener('click', runExactSolver);
   document.getElementById('calExportBtn').addEventListener('click', ()=>{
     if(!currentTermDates || currentNextSemCourses.length===0){
       alert('Nothing to export yet — set at least one course\'s days/time in the timetable above first.');

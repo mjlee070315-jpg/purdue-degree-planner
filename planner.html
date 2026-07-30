@@ -62,14 +62,14 @@
 
   <div class="progress-wrap">
     <div class="progress-head">
-      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="3" width="15" height="14" rx="1"/><path d="M6 8h8M6 11h8M6 14h5"/></svg>Requirement Progress</h2>
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="3" width="15" height="14" rx="1"/><path d="M6 8h8M6 11h8M6 14h5"/></svg>Requirement Progress</h2>
     </div>
     <div id="reqProgressList"></div>
   </div>
 
   <div class="current-wrap">
     <div class="current-head">
-      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4.5C2 3.7 2.7 3 3.5 3H9a1 1 0 011 1v12a1 1 0 00-1-1H3.5c-.8 0-1.5-.7-1.5-1.5V4.5z"/><path d="M18 4.5c0-.8-.7-1.5-1.5-1.5H11a1 1 0 00-1 1v12a1 1 0 011-1h5.5c.8 0 1.5-.7 1.5-1.5V4.5z"/></svg>Currently Taking</h2>
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4.5C2 3.7 2.7 3 3.5 3H9a1 1 0 011 1v12a1 1 0 00-1-1H3.5c-.8 0-1.5-.7-1.5-1.5V4.5z"/><path d="M18 4.5c0-.8-.7-1.5-1.5-1.5H11a1 1 0 00-1 1v12a1 1 0 011-1h5.5c.8 0 1.5-.7 1.5-1.5V4.5z"/></svg>Currently Taking</h2>
     </div>
     <div class="current-note">Set what you're actually enrolled in this semester — the roadmap below is generated for <i>after</i> this semester. Only courses whose prerequisites are already marked complete are offered. Add a predicted grade to see how it would move your GPA.</div>
     <div id="currentCourseList"></div>
@@ -78,7 +78,7 @@
 
   <div class="optimizer">
     <div class="optimizer-head">
-      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="3"/><path d="M10 2v2.2M10 15.8V18M18 10h-2.2M4.2 10H2M15.5 4.5l-1.6 1.6M6.1 13.9l-1.6 1.6M15.5 15.5l-1.6-1.6M6.1 6.1L4.5 4.5"/></svg>Schedule Optimizer</h2>
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="3"/><path d="M10 2v2.2M10 15.8V18M18 10h-2.2M4.2 10H2M15.5 4.5l-1.6 1.6M6.1 13.9l-1.6 1.6M15.5 15.5l-1.6-1.6M6.1 6.1L4.5 4.5"/></svg>Schedule Optimizer</h2>
       <span class="status-msg" id="saveStatus">progress saved locally to this browser</span>
     </div>
     <div class="optimizer-note">Check off courses as you complete them. The scheduler re-solves the remaining prerequisite graph on every change: it prioritizes courses on the longest remaining dependency chain (the critical path to the capstone), then packs each semester up to your credit cap. This is a greedy heuristic for what is really an integer program — decision variable <code>x[course, semester] ∈ {0,1}</code>, prerequisite + credit-cap constraints, objective: minimize semesters to graduation.</div>
@@ -88,6 +88,10 @@
       <div class="slider-val" id="creditCapVal">18</div>
     </div>
     <div id="optimalityBadge" style="margin-top:14px;"></div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <button class="reset-btn" id="runIlpBtn" style="border-color:var(--gold);color:var(--gold);">▸ Run Exact Search (Branch &amp; Bound)</button>
+      <div id="ilpResult"></div>
+    </div>
     <details class="howitworks">
       <summary>How the scheduling model works</summary>
       <div class="body">
@@ -95,15 +99,36 @@
         <b>Edges:</b> prerequisite relationships between courses.<br>
         <b>Constraint:</b> a course can only be scheduled once every prerequisite is scheduled in a strictly earlier semester, and a semester's total credits ≤ your cap.<br>
         <b>Objective:</b> minimize total semesters, tie-broken toward keeping the officially recommended sequencing.<br>
-        <b>Optimality check:</b> every time the schedule updates, the tool also computes a <i>combinatorial lower bound</i> — the larger of (a) total remaining credits ÷ credit cap, rounded up, and (b) the longest remaining prerequisite chain. No valid schedule can beat this bound, so when the greedy result matches it, the schedule is <i>provably</i> optimal — no ILP solver required. When it doesn't match, the gap is shown; closing it exactly is NP-hard at this scale (this is a precedence-constrained scheduling problem, related to P|prec|C<sub>max</sub>), but the greedy result is guaranteed to be within that gap of the true optimum.<br>
+        <b>Optimality check:</b> every time the schedule updates, the tool also computes a <i>combinatorial lower bound</i> — the larger of (a) total remaining credits ÷ credit cap, rounded up, and (b) the longest remaining prerequisite chain. No valid schedule can beat this bound, so when the greedy result matches it, the schedule is <i>provably</i> optimal.<br>
+        <b>Exact search:</b> the "Run Exact Search" button above runs a real branch-and-bound solver — exhaustive subset enumeration per semester with lower-bound pruning, seeded by the greedy result as an initial incumbent, bounded to a 2-second time budget. When the eligible-course set at some step is too large to enumerate exhaustively (&gt;15 courses), it falls back to a single greedy branch and honestly reports the search as incomplete rather than claiming a false proof.<br>
         <b>Caveat:</b> this mirrors each department's published curriculum but isn't the authoritative source — always confirm against myPurduePlan / DegreeWorks and an academic advisor before registering.
       </div>
     </details>
   </div>
 
+  <div class="sens-wrap">
+    <div class="sens-head">
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 17V3M3 17h14"/><path d="M4 14l4-5 3 3 6-8"/></svg>Sensitivity Analysis</h2>
+    </div>
+    <div class="sens-note">How many semesters remain at each possible credit-hour load, for the current major and progress. The highlighted bar is your current slider setting.</div>
+    <div id="sensChart"></div>
+    <div class="sens-elbow" id="sensNote"></div>
+  </div>
+
+  <div class="compare-wrap">
+    <div class="compare-head">
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="3" width="6" height="14" rx="1"/><rect x="10.5" y="7" width="6" height="10" rx="1"/></svg>Compare All Majors</h2>
+    </div>
+    <div class="compare-note">A fresh-start comparison (no completed courses) across all six majors at your current credit cap — useful for deciding between majors before committing to one.</div>
+    <table class="compare-table">
+      <thead><tr><th>Major</th><th>Total Credits</th><th>Semesters</th><th>Lower Bound</th><th>Status</th><th>CPM Steps</th></tr></thead>
+      <tbody id="majorCompareBody"></tbody>
+    </table>
+  </div>
+
   <div class="tt-wrap" id="ttSection">
     <div class="tt-head">
-      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3M7 11h1M12 11h1M7 14h1M12 14h1"/></svg>Weekly Timetable</h2>
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3M7 11h1M12 11h1M7 14h1M12 14h1"/></svg>Weekly Timetable</h2>
       <span class="tt-sem-label" id="ttSemesterLabel"></span>
     </div>
     <div class="tt-note">Real class meeting times change every semester and aren't part of the degree plan itself. This builds a schedule for whatever you checked off in <b>Currently Taking</b> above; if nothing's checked yet, it shows the optimizer's suggested next semester instead. Toggle the days each course meets and set its start/end time; conflicts are flagged automatically.</div>
@@ -114,12 +139,12 @@
 
   <div class="cal-wrap" id="calSection">
     <div class="cal-head">
-      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3"/><circle cx="10" cy="12.5" r="1.6" fill="currentColor" stroke="none"/></svg>Semester Calendar</h2>
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3"/><circle cx="10" cy="12.5" r="1.6" fill="currentColor" stroke="none"/></svg>Semester Calendar</h2>
       <span class="cal-badge" id="calConfirmBadge"></span>
     </div>
     <div class="cal-note">Fall 2026 and Spring 2027 use Purdue's officially published academic calendar. Later terms are projected forward from that pattern (same weekday, ~371 days later) since Purdue hasn't published them yet — verify with the Registrar as your term approaches.</div>
     <div class="cal-keydates" id="calKeyDates"></div>
-    <button class="cal-export-btn" id="calExportBtn"><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" style="color:inherit;"><path d="M10 3v10M6 9l4 4 4-4M4 16.5h12"/></svg>Export to Calendar (.ics)</button>
+    <button class="cal-export-btn" id="calExportBtn"><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" style="color:inherit;"><path d="M10 3v10M6 9l4 4 4-4M4 16.5h12"/></svg>Export to Calendar (.ics)</button>
     <div class="cal-months" id="calMonths"></div>
   </div>
 
@@ -134,7 +159,7 @@
 
   <div class="cpm-wrap">
     <div class="cpm-head">
-      <h2><svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4" cy="10" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="10" cy="16" r="2"/><circle cx="16" cy="10" r="2"/><path d="M6 10h8M5.4 8.6l3.2-3.2M5.4 11.4l3.2 3.2M11.4 6.8l3.2 3.2M11.4 13.2l3.2-3.2"/></svg>Critical Path Network (CPM)</h2>
+      <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4" cy="10" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="10" cy="16" r="2"/><circle cx="16" cy="10" r="2"/><path d="M6 10h8M5.4 8.6l3.2-3.2M5.4 11.4l3.2 3.2M11.4 6.8l3.2 3.2M11.4 13.2l3.2-3.2"/></svg>Critical Path Network (CPM)</h2>
       <span class="cpm-badge" id="cpmBadge"></span>
     </div>
     <div class="cpm-note">A real Critical Path Method analysis of the full degree — Early Start/Finish and Late Start/Finish computed for every course, assuming <i>unlimited</i> parallel course-taking (no credit cap). Courses with zero slack (gold, thick edges) form the critical path: delay any one of them and graduation slips. This differs from the credit-capped roadmap below, which is the realistic, resource-constrained version of the same problem.</div>
@@ -142,7 +167,7 @@
   </div>
 
   <div class="roadmap-label">
-    <svg class="icon-inline" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 10h3l2-5 4 10 2-5h3"/></svg>
+    <svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 10h3l2-5 4 10 2-5h3"/></svg>
     Roadmap — remaining semesters after what you're currently taking
   </div>
 
@@ -154,6 +179,7 @@
 
   <footer style="margin-top:34px;font-size:11px;color:var(--muted-dim);line-height:1.7;border-top:1px solid var(--border);padding-top:16px;">
     Course lists, credit hours, and prerequisite sequencing are drawn from Purdue University's published plans of study and department handbooks for Industrial, Mechanical, Electrical, Civil, and Chemical Engineering, Computer Science, and First-Year Engineering. Elective and track slots are shown as generic placeholders — swap in specific course titles once chosen. This tool is unofficial and for personal planning only; degree audits run through myPurduePlan / DegreeWorks are authoritative.
+    <br><a href="index.html">← Back to overview</a> &nbsp;·&nbsp; <a href="https://minjaelee.goatcounter.com" target="_blank" rel="noopener">Live visitor stats →</a>
   </footer>
 
 </div>

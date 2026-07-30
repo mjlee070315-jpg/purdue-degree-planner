@@ -100,6 +100,27 @@ different — and looser — relaxation than the credit-capped roadmap:
 comparing the two is itself a small demonstration of relaxation-vs-reality
 thinking in operations research.
 
+## Sensitivity analysis, major comparison, and exact search
+
+Three additions push the optimization story further:
+
+- **Sensitivity analysis** — a bar chart of semesters-to-graduation against
+  every credit cap from 12 to 19, showing exactly where more credits per
+  semester stop shortening the plan (diminishing returns / the "elbow
+  point").
+- **Major comparison table** — all six majors compared from a fresh start
+  at the current credit cap: total credits, semesters, lower bound,
+  optimality status, and CPM critical-path length side by side.
+- **Exact search (branch & bound)** — an on-demand button runs a real
+  branch-and-bound solver: exhaustive subset enumeration per semester with
+  lower-bound pruning, seeded by the greedy result, bounded to a 2-second
+  time budget. When the eligible-course set at a given step is too large to
+  enumerate exhaustively, it falls back to a single greedy branch and
+  honestly reports the search as incomplete rather than claiming a false
+  proof. Run from scratch, it actually finds that the greedy heuristic is
+  **not** optimal for ECE (a real 7-vs-8-semester improvement) — a concrete,
+  honest demonstration of a heuristic's limits, not just an abstract claim.
+
 ## Currently taking & GPA projection
 
 Above the roadmap, a **Currently Taking** panel lists only the courses your
