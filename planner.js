@@ -1382,6 +1382,232 @@ function render(){
   }
 }
 
+
+const ASSIGNMENTS = [
+{date:"2026-08-24",course:"CHM 11520L",type:"Event",title:"Lab Orientation, Safety Quiz, Week 1 Problem Solving",note:"Reading 1.3\u20131.5, 2.3\u20132.6"},
+{date:"2026-08-25",course:"CHM 11520L",type:"Report",title:"Week 1 Report",note:"Due Tue 11:59 PM (day of lab) \u2014 *not counted in Report grade category"},
+{date:"2026-08-26",course:"CHM 11510",type:"HW",title:"Math Review",note:"Due Wed 11:59 PM"},
+{date:"2026-08-26",course:"CHM 11510",type:"Upload",title:"Week 1 REC Worksheet Upload",note:"Due day of REC (Wed) 11:59 PM \u2014 no pre-rec quiz week 1"},
+{date:"2026-08-27",course:"MA 16100",type:"HW",title:"HW due: Lessons 1, 2",note:"Recitation 2 (Thu) \u2014 no quiz week 1"},
+{date:"2026-08-31",course:"CHM 11520L",type:"Event",title:"Check-In, iPad Orientation, Group Member Agreement",note:"Reading 2.7, 3.1, 3.3"},
+{date:"2026-09-01",course:"CHM 11510",type:"Quiz",title:"Week 2 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-09-01",course:"CHM 11520L",type:"Report",title:"Week 2 Report",note:"Due Tue 11:59 PM (day of lab) \u2014 *not counted in Report grade category"},
+{date:"2026-09-01",course:"MA 16100",type:"Quiz",title:"Quiz #1 (Lessons 1, 2)",note:"Recitation 3 (Tue)"},
+{date:"2026-09-01",course:"MA 16100",type:"HW",title:"HW due: Lessons 3, 4",note:"Recitation 3 (Tue)"},
+{date:"2026-09-02",course:"CHM 11510",type:"Upload",title:"Week 2 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-09-02",course:"CHM 11510",type:"HW",title:"HW01",note:"Due Wed 11:59 PM"},
+{date:"2026-09-03",course:"MA 16100",type:"Quiz",title:"Quiz #2 (Lessons 3, 4)",note:"Recitation 4 (Thu)"},
+{date:"2026-09-03",course:"MA 16100",type:"HW",title:"HW due: Lesson 5",note:"Recitation 4 (Thu)"},
+{date:"2026-09-04",course:"MA 16100",type:"Event",title:"Last Day to Drop (No Record)"},
+{date:"2026-09-07",course:"CHM 11520L",type:"Prelab",title:"Lab 1: Intro to Measurement Techniques \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 4.1"},
+{date:"2026-09-08",course:"CHM 11510",type:"Quiz",title:"Week 3 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-09-08",course:"CHM 11520L",type:"Report",title:"Lab 1 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-09-08",course:"MA 16100",type:"Quiz",title:"Quiz #3 (Lesson 5)",note:"Recitation 5 (Tue)"},
+{date:"2026-09-08",course:"MA 16100",type:"HW",title:"HW due: Lesson 6",note:"Recitation 5 (Tue)"},
+{date:"2026-09-09",course:"CHM 11510",type:"Upload",title:"Week 3 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-09-09",course:"CHM 11510",type:"HW",title:"HW02",note:"Due Wed 11:59 PM"},
+{date:"2026-09-10",course:"MA 16100",type:"Quiz",title:"Quiz #4 (Lesson 6)",note:"Recitation 6 (Thu)"},
+{date:"2026-09-10",course:"MA 16100",type:"HW",title:"HW due: Lesson 7",note:"Recitation 6 (Thu)"},
+{date:"2026-09-14",course:"CHM 11520L",type:"Prelab",title:"Lab 2: Physical Property Separation \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 4.2, 4.3, 6.1\u20136.2"},
+{date:"2026-09-15",course:"CHM 11510",type:"Quiz",title:"Week 4 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-09-15",course:"CHM 11520L",type:"Report",title:"Lab 2 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-09-15",course:"MA 16100",type:"Quiz",title:"Quiz #5 (Lesson 7)",note:"Recitation 7 (Tue)"},
+{date:"2026-09-15",course:"MA 16100",type:"HW",title:"HW due: Lessons 8, 9",note:"Recitation 7 (Tue)"},
+{date:"2026-09-16",course:"CHM 11510",type:"Upload",title:"Week 4 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-09-16",course:"CHM 11510",type:"HW",title:"HW03",note:"Due Wed 11:59 PM"},
+{date:"2026-09-17",course:"MA 16100",type:"Quiz",title:"Quiz #6 (Lessons 8, 9)",note:"Recitation 8 (Thu)"},
+{date:"2026-09-17",course:"MA 16100",type:"HW",title:"HW due: Lesson 10",note:"Recitation 8 (Thu)"},
+{date:"2026-09-21",course:"CHM 11510",type:"Event",title:"Exam 1 Review in REC",note:"Attendance points only"},
+{date:"2026-09-21",course:"CHM 11520L",type:"Prelab",title:"Lab 3: Producing a Salt from an Element \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 6.3\u20136.6"},
+{date:"2026-09-22",course:"CHM 11520L",type:"Report",title:"Lab 3 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-09-22",course:"MA 16100",type:"Quiz",title:"Quiz #7 (Lesson 10)",note:"Recitation 9 (Tue) \u2014 no HW due"},
+{date:"2026-09-23",course:"CHM 11510",type:"HW",title:"HW04",note:"Due Wed 11:59 PM"},
+{date:"2026-09-23",course:"MA 16100",type:"Exam",title:"Exam 1",note:"Lessons 1\u201310, 8:00\u20139:00 PM (Room TBD)"},
+{date:"2026-09-24",course:"CHM 11510",type:"Exam",title:"Exam 1",note:"Thurs. Sept. 24, 8:00\u20139:00 PM"},
+{date:"2026-09-24",course:"MA 16100",type:"HW",title:"HW due: Lessons 11, 12",note:"Recitation 10 (Thu) \u2014 no quiz"},
+{date:"2026-09-28",course:"CHM 11520L",type:"Prelab",title:"Lab 4: Heat of a Reaction \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 7.1\u20137.3"},
+{date:"2026-09-29",course:"CHM 11510",type:"Quiz",title:"Week 6 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-09-29",course:"CHM 11520L",type:"Report",title:"Lab 4 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-09-29",course:"MA 16100",type:"Quiz",title:"Quiz #8 (Lessons 11, 12)",note:"Recitation 11 (Tue)"},
+{date:"2026-09-29",course:"MA 16100",type:"HW",title:"HW due: Lessons 13, 14",note:"Recitation 11 (Tue)"},
+{date:"2026-09-30",course:"CHM 11510",type:"Upload",title:"Week 6 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-09-30",course:"CHM 11510",type:"HW",title:"HW05",note:"Due Wed 11:59 PM"},
+{date:"2026-10-01",course:"MA 16100",type:"Quiz",title:"Quiz #9 (Lessons 13, 14)",note:"Recitation 12 (Thu)"},
+{date:"2026-10-01",course:"MA 16100",type:"HW",title:"HW due: Lesson 15",note:"Recitation 12 (Thu)"},
+{date:"2026-10-05",course:"CHM 11520L",type:"Prelab",title:"Lab 5: Absorption of Light / Concentration \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 7.4, 8.1\u20138.2"},
+{date:"2026-10-06",course:"CHM 11510",type:"Quiz",title:"Week 7 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-10-06",course:"CHM 11520L",type:"Report",title:"Lab 5 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-10-06",course:"MA 16100",type:"Quiz",title:"Quiz #10 (Lesson 15)",note:"Recitation 13 (Tue)"},
+{date:"2026-10-06",course:"MA 16100",type:"HW",title:"HW due: Lessons 16, 17",note:"Recitation 13 (Tue)"},
+{date:"2026-10-07",course:"CHM 11510",type:"Upload",title:"Week 7 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-10-07",course:"CHM 11510",type:"HW",title:"HW06",note:"Due Wed 11:59 PM"},
+{date:"2026-10-08",course:"MA 16100",type:"Quiz",title:"Quiz #11 (Lessons 16, 17)",note:"Recitation 14 (Thu)"},
+{date:"2026-10-08",course:"MA 16100",type:"HW",title:"HW due: Lesson 18",note:"Recitation 14 (Thu)"},
+{date:"2026-10-12",course:"CHM 11510",type:"Event",title:"No Recitation \u2014 Fall Break",note:"10/12\u201310/13"},
+{date:"2026-10-12",course:"CHM 11520L",type:"Event",title:"Fall Break \u2014 No Lab",note:"Reading 8.3\u20138.4"},
+{date:"2026-10-13",course:"MA 16100",type:"HW",title:"HW due: Lesson 19",note:"Fall Break (Tue) \u2014 HW still due"},
+{date:"2026-10-14",course:"CHM 11510",type:"HW",title:"HW07",note:"Due Wed 11:59 PM"},
+{date:"2026-10-15",course:"MA 16100",type:"Quiz",title:"Quiz #12 (Lessons 18, 19)",note:"Recitation 15 (Thu)"},
+{date:"2026-10-15",course:"MA 16100",type:"HW",title:"HW due: Lesson 20",note:"Recitation 15 (Thu)"},
+{date:"2026-10-19",course:"CHM 11520L",type:"Prelab",title:"Lab 6: Which Cereal Contains the Most Iron? \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 9.1\u20139.6"},
+{date:"2026-10-19",course:"MA 16100",type:"Exam",title:"Exam 2",note:"Lessons 11\u201320, 8:00\u20139:00 PM (Room TBD)"},
+{date:"2026-10-20",course:"CHM 11520L",type:"Report",title:"Lab 6 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-10-20",course:"MA 16100",type:"HW",title:"HW due: Lesson 21",note:"Recitation 16 (Tue) \u2014 no quiz"},
+{date:"2026-10-21",course:"CHM 11510",type:"HW",title:"HW08",note:"Due Wed 11:59 PM"},
+{date:"2026-10-21",course:"CHM 11510",type:"Exam",title:"Exam 2",note:"Wed. Oct. 21, 8:00\u20139:00 PM"},
+{date:"2026-10-22",course:"MA 16100",type:"Quiz",title:"Quiz #13 (Lesson 21)",note:"Recitation 17 (Thu)"},
+{date:"2026-10-22",course:"MA 16100",type:"HW",title:"HW due: Lesson 22",note:"Recitation 17 (Thu)"},
+{date:"2026-10-26",course:"CHM 11520L",type:"Event",title:"Lab 7: Do You See the Light?",note:"Reading 10.1\u201310.2 \u2014 no prelab/report listed on schedule"},
+{date:"2026-10-27",course:"CHM 11510",type:"Quiz",title:"Week 10 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-10-27",course:"MA 16100",type:"Quiz",title:"Quiz #14 (Lesson 22)",note:"Recitation 18 (Tue)"},
+{date:"2026-10-27",course:"MA 16100",type:"HW",title:"HW due: Lessons 23, 24",note:"Recitation 18 (Tue)"},
+{date:"2026-10-28",course:"CHM 11510",type:"Upload",title:"Week 10 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-10-28",course:"CHM 11510",type:"HW",title:"HW09",note:"Due Wed 11:59 PM"},
+{date:"2026-10-29",course:"MA 16100",type:"Quiz",title:"Quiz #15 (Lessons 23, 24)",note:"Recitation 19 (Thu)"},
+{date:"2026-10-29",course:"MA 16100",type:"HW",title:"HW due: Lesson 25",note:"Recitation 19 (Thu)"},
+{date:"2026-11-02",course:"CHM 11520L",type:"Prelab",title:"Lab 8: Molecular Shape & Polarity \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 10.3, 12.1"},
+{date:"2026-11-03",course:"CHM 11510",type:"Quiz",title:"Week 11 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-11-03",course:"CHM 11520L",type:"Report",title:"Lab 8 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-11-03",course:"MA 16100",type:"Quiz",title:"Quiz #16 (Lesson 25)",note:"Recitation 20 (Tue)"},
+{date:"2026-11-03",course:"MA 16100",type:"HW",title:"HW due: Lessons 26, 27",note:"Recitation 20 (Tue)"},
+{date:"2026-11-04",course:"CHM 11510",type:"Upload",title:"Week 11 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-11-04",course:"CHM 11510",type:"HW",title:"HW10",note:"Due Wed 11:59 PM"},
+{date:"2026-11-05",course:"MA 16100",type:"Quiz",title:"Quiz #17 (Lessons 26, 27)",note:"Recitation 21 (Thu)"},
+{date:"2026-11-05",course:"MA 16100",type:"HW",title:"HW due: Lesson 28",note:"Recitation 21 (Thu)"},
+{date:"2026-11-09",course:"CHM 11520L",type:"Prelab",title:"Lab 9: Chromatography \u2014 Separating Plant Pigments \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 12.2, 12.3, 12.6"},
+{date:"2026-11-10",course:"CHM 11510",type:"Quiz",title:"Week 12 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-11-10",course:"CHM 11520L",type:"Report",title:"Lab 9 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-11-10",course:"MA 16100",type:"Quiz",title:"Quiz #18 (Lesson 28)",note:"Recitation 22 (Tue)"},
+{date:"2026-11-10",course:"MA 16100",type:"HW",title:"HW due: Lessons 29, 30",note:"Recitation 22 (Tue)"},
+{date:"2026-11-11",course:"CHM 11510",type:"Upload",title:"Week 12 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-11-11",course:"CHM 11510",type:"HW",title:"HW11",note:"Due Wed 11:59 PM"},
+{date:"2026-11-12",course:"MA 16100",type:"Quiz",title:"Quiz #19 (Lessons 29, 30)",note:"Recitation 23 (Thu)"},
+{date:"2026-11-12",course:"MA 16100",type:"HW",title:"HW due: Lesson 31",note:"Recitation 23 (Thu)"},
+{date:"2026-11-16",course:"CHM 11510",type:"Event",title:"Exam 3 Review in REC",note:"Attendance points only"},
+{date:"2026-11-16",course:"CHM 11520L",type:"Prelab",title:"Lab 10: Molecular Interactions of Washing \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 13.1, 15.6, 13.6"},
+{date:"2026-11-17",course:"CHM 11520L",type:"Report",title:"Lab 10 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-11-17",course:"MA 16100",type:"Quiz",title:"Quiz #20 (Lesson 31)",note:"Recitation 24 (Tue) \u2014 no HW due"},
+{date:"2026-11-18",course:"CHM 11510",type:"HW",title:"HW12",note:"Due Wed 11:59 PM"},
+{date:"2026-11-18",course:"MA 16100",type:"Exam",title:"Exam 3",note:"Lessons 21\u201331, 8:00\u20139:00 PM (Room TBD)"},
+{date:"2026-11-19",course:"CHM 11510",type:"Exam",title:"Exam 3",note:"Thurs. Nov. 19, 8:00\u20139:00 PM"},
+{date:"2026-11-19",course:"MA 16100",type:"HW",title:"HW due: Lessons 32, 33",note:"Recitation 25 (Thu) \u2014 no quiz"},
+{date:"2026-11-23",course:"CHM 11520L",type:"Event",title:"Thanksgiving \u2014 No Lab"},
+{date:"2026-11-24",course:"MA 16100",type:"Event",title:"Last Day to Drop with Advisor Approval (W grade)"},
+{date:"2026-11-30",course:"CHM 11520L",type:"Prelab",title:"Lab 11: Synthetic & Biological Polymers \u2014 Prelab Quiz & Procedure",note:"Due Mon 11:59 PM (day before Tue lab). Reading 5.#-5.#"},
+{date:"2026-12-01",course:"CHM 11510",type:"Quiz",title:"Week 15 Pre-Recitation Quiz",note:"Due Tue 11:59 PM (day before Wed REC)"},
+{date:"2026-12-01",course:"CHM 11520L",type:"Report",title:"Lab 11 Report",note:"Due Tue 11:59 PM (day of lab)"},
+{date:"2026-12-01",course:"MA 16100",type:"Quiz",title:"Quiz #21 (Lessons 32, 33)",note:"Recitation 26 (Tue)"},
+{date:"2026-12-01",course:"MA 16100",type:"HW",title:"HW due: Lessons 34, 35",note:"Recitation 26 (Tue)"},
+{date:"2026-12-02",course:"CHM 11510",type:"Upload",title:"Week 15 REC Worksheet Upload",note:"Due Wed 11:59 PM (day of REC)"},
+{date:"2026-12-02",course:"CHM 11510",type:"HW",title:"HW13",note:"Due Wed 11:59 PM"},
+{date:"2026-12-03",course:"MA 16100",type:"Quiz",title:"Quiz #22 (Lessons 34, 35)",note:"Recitation 27 (Thu)"},
+{date:"2026-12-03",course:"MA 16100",type:"HW",title:"HW due: Lesson 36",note:"Recitation 27 (Thu)"},
+{date:"2026-12-05",course:"CHM 11510",type:"HW",title:"HW14",note:"Due Sat 11:59 PM"},
+{date:"2026-12-07",course:"CHM 11510",type:"Event",title:"Quiet Week \u2014 REC meets (attendance only)"},
+{date:"2026-12-07",course:"CHM 11520L",type:"Event",title:"Check Out",note:"Reading 24.1, 24.5\u201324.7"},
+{date:"2026-12-11",course:"MA 16100",type:"Event",title:"Last Day of Classes \u2014 Final Exam Review"},
+{date:"2026-12-14",course:"CHM 11510",type:"Exam",title:"Final Exam",note:"Finals week (12/14\u2013), exact date/time TBA"},
+{date:"2026-12-14",course:"CHM 11520L",type:"Event",title:"No Final Exam for Lab"},
+{date:"2026-12-14",course:"MA 16100",type:"Exam",title:"Final Exam",note:"Finals week Dec 14\u201319, comprehensive (Lessons 1\u201336), date/time/room TBA"}
+];
+
+// ---- Assignment Dashboard ----
+const ASSIGN_TYPE_COLOR = {
+  Exam:'var(--danger)', HW:'var(--gold-bright)', Quiz:'var(--science)',
+  Prelab:'var(--elective)', Report:'var(--complete)', Upload:'var(--muted)', Event:'var(--muted-dim)'
+};
+const ASSIGN_COURSE_CLASS = {
+  'CHM 11510':'course-chm1', 'CHM 11520L':'course-chm2', 'MA 16100':'course-math'
+};
+let assignActiveCourse = 'All';
+
+function fmtAssignDate(dstr){
+  const d = new Date(dstr+'T00:00:00');
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+function escHtml(s){
+  return String(s).replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+}
+
+function renderAssignments(){
+  const filtersEl = document.getElementById('assignFilters');
+  const listEl = document.getElementById('assignList');
+  const countEl = document.getElementById('assignCount');
+  if(!filtersEl || !listEl) return;
+
+  const courseOrder = ['CHM 11510','CHM 11520L','MA 16100'];
+  const courses = ['All', ...courseOrder];
+
+  if(!filtersEl.dataset.built){
+    filtersEl.innerHTML = courses.map(c=>
+      `<button class="assign-filter-btn${c===assignActiveCourse?' active':''}" data-course="${c}">${c}</button>`
+    ).join('');
+    filtersEl.dataset.built = '1';
+    filtersEl.querySelectorAll('.assign-filter-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        assignActiveCourse = btn.getAttribute('data-course');
+        renderAssignments();
+      });
+    });
+  } else {
+    filtersEl.querySelectorAll('.assign-filter-btn').forEach(btn=>{
+      btn.classList.toggle('active', btn.getAttribute('data-course')===assignActiveCourse);
+    });
+  }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayKey = today.getFullYear()+'-'+pad2(today.getMonth()+1)+'-'+pad2(today.getDate());
+
+  const filtered = ASSIGNMENTS.filter(a=>assignActiveCourse==='All' || a.course===assignActiveCourse);
+  countEl.textContent = filtered.length + (filtered.length===1?' item':' items');
+
+  let html = '';
+  let lastMonthKey = '';
+  filtered.forEach(a=>{
+    const endDateStr = a.exact===false ? a.dateTo : a.date;
+    const d = new Date(a.date+'T00:00:00');
+    const monthKey = d.getFullYear()+'-'+pad2(d.getMonth()+1);
+    if(monthKey !== lastMonthKey){
+      html += `<div class="assign-month">${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}</div>`;
+      lastMonthKey = monthKey;
+    }
+    const isPast = endDateStr < todayKey;
+    const isDueSoon = !isPast && (new Date(a.date+'T00:00:00') - today)/86400000 <= 7;
+    const dateLabel = a.exact===false ? (fmtAssignDate(a.date)+' – '+fmtAssignDate(a.dateTo)) : fmtAssignDate(a.date);
+    const courseClass = ASSIGN_COURSE_CLASS[a.course] || '';
+    const typeColor = ASSIGN_TYPE_COLOR[a.type] || 'var(--muted)';
+    html += `<div class="assign-row${isPast?' past':''}${isDueSoon?' upcoming':''}">
+      <div class="assign-date">${dateLabel}${a.exact===false?' <span class="assign-approx" title="Depends on your section/lab day — shown as the possible date range">≈</span>':''}</div>
+      <div class="assign-course-tag ${courseClass}">${escHtml(a.course)}</div>
+      <div class="assign-type-badge" style="color:${typeColor};border-color:${typeColor}">${escHtml(a.type)}</div>
+      <div class="assign-body"><div class="assign-title">${escHtml(a.title)}</div>${a.note?`<div class="assign-item-note">${escHtml(a.note)}</div>`:''}</div>
+    </div>`;
+  });
+  listEl.innerHTML = html || '<div class="assign-empty">No items for this filter.</div>';
+}
+
+function generateAssignmentsICS(){
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Smart Course Planner//Assignments//EN','CALSCALE:GREGORIAN'];
+  const now = new Date();
+  const dtstamp = now.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
+  ASSIGNMENTS.forEach((a,i)=>{
+    const dueDate = a.exact===false ? a.dateTo : a.date;
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:assign-'+i+'-'+now.getTime()+'@smartcourseplanner');
+    lines.push('DTSTAMP:'+dtstamp);
+    lines.push('DTSTART;VALUE=DATE:'+dueDate.replace(/-/g,''));
+    const summary = ('['+a.course+'] '+a.type+': '+a.title).replace(/[\r\n,;]/g,' ');
+    lines.push('SUMMARY:'+summary);
+    let desc = (a.note||'');
+    if(a.exact===false) desc += (desc?' — ':'') + 'Date range '+a.date+' to '+a.dateTo+' depending on your section/lab day.';
+    if(desc) lines.push('DESCRIPTION:'+desc.replace(/[\r\n,;]/g,' '));
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+
 function initPlanner(){
   document.getElementById('creditCap').addEventListener('input', render);
   document.getElementById('runIlpBtn').addEventListener('click', runExactSolver);
@@ -1418,5 +1644,18 @@ function initPlanner(){
       render();
     }
   });
+  document.getElementById('assignExportBtn').addEventListener('click', ()=>{
+    const ics = generateAssignmentsICS();
+    const blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'assignments.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+  renderAssignments();
   loadState();
 }
