@@ -247,6 +247,8 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 .tt-course-code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);font-weight:600;}
 .tt-meeting-row{display:flex;align-items:center;gap:8px;padding:4px 0 4px 16px;flex-wrap:wrap;}
 .tt-meeting-label-input{background:var(--bg-panel-raised);border:1px solid var(--border);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 6px;width:110px;}
+.tt-meeting-room-input{background:var(--bg-panel-raised);border:1px solid var(--border);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 6px;width:100px;}
+.tt-block .tt-block-room{display:block;font-size:9px;color:var(--muted);margin-top:1px;}
 .tt-remove-btn{background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;width:22px;height:22px;cursor:pointer;line-height:1;flex:none;}
 .tt-remove-btn:hover{border-color:var(--danger);color:var(--danger);}
 .tt-add-btn{background:none;border:1px dashed var(--border);color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:5px 12px;cursor:pointer;margin:6px 0 0 16px;}
@@ -258,7 +260,8 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 .tt-day-btn.active{background:var(--gold-bright);color:var(--bg);border-color:var(--gold-bright);}
 .tt-time-input{background:var(--bg-panel-raised);border:1px solid var(--border);color:var(--ink);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 6px;color-scheme:dark;}
 .tt-conflicts{display:none;margin:14px 0;padding:10px 14px;border:1px solid var(--danger);color:var(--danger);font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;background:rgba(184,80,47,0.08);}
-.tt-grid-container{display:grid;grid-template-columns:44px repeat(5,1fr);border:1px solid var(--border);margin-top:18px;background:var(--bg);}
+.tt-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tt-grid-container{display:grid;grid-template-columns:44px repeat(5,1fr);min-width:520px;border:1px solid var(--border);margin-top:18px;background:var(--bg);}
 .tt-grid-header{padding:8px 4px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);border-left:1px solid var(--border);}
 .tt-grid-header:first-child{border-left:none;}
 .tt-time-col{position:relative;}
@@ -406,7 +409,8 @@ select.predicted-grade{background:var(--bg-panel-raised);color:var(--ink);border
 .compare-wrap{border:1px solid var(--border);background:var(--bg-panel);padding:20px 24px;margin-bottom:22px;}
 .compare-head h2{font-family:'Space Grotesk',sans-serif;font-size:16px;margin:0 0 6px;display:flex;align-items:center;}
 .compare-note{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px;max-width:720px;}
-.compare-table{width:100%;border-collapse:collapse;font-size:12px;}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.compare-table{width:100%;min-width:520px;border-collapse:collapse;font-size:12px;}
 .compare-table th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border);}
 .compare-table td{padding:9px 10px;border-bottom:1px solid rgba(207,185,145,0.06);color:var(--ink);}
 .compare-row-active{background:rgba(207,185,145,0.06);}
@@ -435,3 +439,45 @@ footer.site-footer{border-top:1px solid var(--border);padding:36px 0 50px;}
 footer.site-footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;}
 footer.site-footer p{font-size:11px;color:var(--muted-dim);line-height:1.7;max-width:640px;margin:0;}
 footer.site-footer a{color:var(--muted);}
+
+/* ============================================================
+   Mobile-first responsive pass (planner.html)
+   ============================================================ */
+@media(max-width:900px){
+  .semgrid{grid-template-columns:repeat(2,1fr);}
+  .dash{grid-template-columns:repeat(2,1fr);}
+  .titleblock{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .wrap{padding:0 14px;}
+  body{font-size:14px;}
+  .titleblock-main{padding:16px 16px;border-right:none;border-bottom:1px solid var(--border);}
+  .titleblock-meta{grid-template-columns:1fr 1fr;}
+  h1#programLabel{font-size:20px;}
+  .major-select{flex-direction:column;align-items:flex-start;gap:8px;}
+  .optimizer,.progress-wrap,.current-wrap,.sens-wrap,.compare-wrap,.tt-wrap,.cal-wrap,.assign-wrap,.cpm-wrap{padding:16px 14px;}
+  .slider-row{flex-wrap:wrap;gap:10px;}
+  .cal-months{gap:12px;justify-content:center;}
+  .cal-month{width:150px;}
+  .tt-meeting-row{gap:6px;padding-left:8px;}
+  .tt-meeting-label-input,.tt-meeting-room-input{width:84px;}
+  .tt-day-btn{width:22px;height:22px;font-size:9px;}
+  .current-course-row,.tt-course-row{flex-direction:column;align-items:flex-start;}
+  .assign-controls{flex-direction:column;align-items:stretch;}
+  .assign-filters{justify-content:flex-start;}
+  .assign-wrap .cal-export-btn{width:100%;justify-content:center;}
+  .cal-export-btn{width:100%;justify-content:center;}
+  .legend{gap:10px 16px;}
+}
+@media(max-width:560px){
+  .semgrid{grid-template-columns:1fr;}
+  .dash{grid-template-columns:repeat(2,1fr);}
+  .titleblock-meta{grid-template-columns:1fr;}
+  .meta-cell:nth-child(odd){border-right:none;}
+  .nav-links{gap:12px;}
+  .req-row-top{flex-wrap:wrap;gap:4px;}
+  .stat-value{font-size:21px;}
+  .cal-month{width:130px;}
+  .assign-date{white-space:normal;}
+}
+

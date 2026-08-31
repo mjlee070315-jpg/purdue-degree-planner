@@ -33,6 +33,7 @@
       <button class="major-btn" data-major="cs">CS</button>
       <button class="major-btn" data-major="che">ChemE</button>
       <button class="major-btn" data-major="ce">CE</button>
+      <button class="major-btn" data-major="met">Mechatronics</button>
     </div>
   </div>
 
@@ -120,10 +121,12 @@
       <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="3" width="6" height="14" rx="1"/><rect x="10.5" y="7" width="6" height="10" rx="1"/></svg>Compare All Majors</h2>
     </div>
     <div class="compare-note">A fresh-start comparison (no completed courses) across all six majors at your current credit cap — useful for deciding between majors before committing to one.</div>
-    <table class="compare-table">
-      <thead><tr><th>Major</th><th>Total Credits</th><th>Semesters</th><th>Lower Bound</th><th>Status</th><th>CPM Steps</th></tr></thead>
-      <tbody id="majorCompareBody"></tbody>
-    </table>
+    <div class="table-scroll">
+      <table class="compare-table">
+        <thead><tr><th>Major</th><th>Total Credits</th><th>Semesters</th><th>Lower Bound</th><th>Status</th><th>CPM Steps</th></tr></thead>
+        <tbody id="majorCompareBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="tt-wrap" id="ttSection">
@@ -134,7 +137,9 @@
     <div class="tt-note">Real class meeting times change every semester and aren't part of the degree plan itself. This builds a schedule for whatever you checked off in <b>Currently Taking</b> above; if nothing's checked yet, it shows the optimizer's suggested next semester instead. Toggle the days each course meets and set its start/end time; conflicts are flagged automatically.</div>
     <div id="ttCourseInputs"></div>
     <div class="tt-conflicts" id="ttConflicts"></div>
-    <div class="tt-grid-container" id="ttGrid"></div>
+    <div class="tt-scroll">
+      <div class="tt-grid-container" id="ttGrid"></div>
+    </div>
   </div>
 
   <div class="cal-wrap" id="calSection">

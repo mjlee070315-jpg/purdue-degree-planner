@@ -294,6 +294,66 @@ const PROGRAMS = {
     ]
   },
 
+  met: {
+    label: 'Mechatronics Engineering Technology, BS',
+    school: 'Purdue Polytechnic — School of Engineering Technology',
+    // Sourced from the official 2026-27 Purdue Catalog "Sample 4-Year Plan"
+    // for Mechatronics Engineering Technology, BS (Manufacturing Engineering
+    // Technology program, West Lafayette). Selective/range credit courses
+    // use a representative credit value. Prereq edges are inferred from
+    // course sequencing/numbering, not an official prereq graph — Purdue
+    // only publishes real prereqs behind myPurduePlan/DegreeWorks login.
+    courses: [
+      {id:'CNIT105',name:'Introduction to C Programming',credits:3,term:1,cat:'fye',prereq:[],critical:true},
+      {id:'ENGT182',name:'Gateway to Engineering Technology',credits:4,term:1,cat:'fye',prereq:[]},
+      {id:'MatProcSel',name:'Materials & Process Selective',credits:3,term:1,cat:'elective',prereq:[]},
+      {id:'CalcSel1',name:'Calculus Selective I',credits:3,term:1,cat:'fye',prereq:[]},
+      {id:'WrittenComm',name:'Written Communication (UCC: WC)',credits:3,term:1,cat:'elective',prereq:[]},
+
+      {id:'ECET224',name:'Electronic Systems',credits:3,term:2,cat:'support',prereq:[]},
+      {id:'MET111',name:'Applied Statics',credits:3,term:2,cat:'major',prereq:['CalcSel1']},
+      {id:'TECH120',name:'Design Thinking in Technology',credits:3,term:2,cat:'elective',prereq:[]},
+      {id:'HumFound',name:'Human Cultures: Humanities (UCC: HUM)',credits:3,term:2,cat:'elective',prereq:[]},
+      {id:'CalcSel2',name:'Calculus Selective II',credits:3,term:2,cat:'fye',prereq:['CalcSel1']},
+
+      {id:'CS17700',name:'Programming with Multimedia Objects',credits:4,term:3,cat:'major',prereq:['CNIT105']},
+      {id:'ECET179',name:'Introduction to Microcontrollers',credits:3,term:3,cat:'major',prereq:[]},
+      {id:'ECET302',name:'Industrial Control Systems for Smart Manufacturing',credits:3,term:3,cat:'major',prereq:['ECET179'],critical:true},
+      {id:'MET213',name:'Dynamics',credits:3,term:3,cat:'major',prereq:['MET111']},
+      {id:'OralComm',name:'Oral Communication (UCC: OC)',credits:3,term:3,cat:'elective',prereq:[]},
+
+      {id:'ECET279',name:'Embedded Digital Systems',credits:3,term:4,cat:'major',prereq:['ECET179'],critical:true},
+      {id:'MET230',name:'Fluid Power',credits:3,term:4,cat:'major',prereq:[]},
+      {id:'MFET241',name:'Automatic Control Systems',credits:3,term:4,cat:'major',prereq:[]},
+      {id:'STAT301',name:'Elementary Statistical Methods',credits:3,term:4,cat:'support',prereq:[]},
+      {id:'PhysicsSel',name:'Physics Selective',credits:4,term:4,cat:'fye',prereq:['CalcSel1']},
+
+      {id:'ECET369',name:'Applied Computer Vision for Sensing and Automation',credits:3,term:5,cat:'major',prereq:['ECET279']},
+      {id:'IET214',name:'Introduction to Supply Chain Management Technology',credits:3,term:5,cat:'support',prereq:[]},
+      {id:'MFET361',name:'Machine Learning and Manufacturing Analytics',credits:3,term:5,cat:'major',prereq:[]},
+      {id:'EngDesignSel',name:'Engineering Design and Visualization Selective',credits:3,term:5,cat:'elective',prereq:[]},
+      {id:'ConcElec1',name:'Optional Concentration Selective or Elective I',credits:3,term:5,cat:'elective',prereq:[]},
+
+      {id:'MET315',name:'Applied Mechanism Kinematics and Dynamics',credits:3,term:6,cat:'major',prereq:['MET213']},
+      {id:'MET382',name:'Controls and Instrumentation for Automation',credits:3,term:6,cat:'major',prereq:['MFET241']},
+      {id:'MFET371',name:'Introduction to Precision Machine Design',credits:3,term:6,cat:'major',prereq:[]},
+      {id:'Sci2Sel',name:'Science #2 (UCC: SCI)',credits:1,term:6,cat:'elective',prereq:[]},
+      {id:'ConcElec2',name:'Optional Concentration Selective or Elective II',credits:3,term:6,cat:'elective',prereq:[]},
+
+      {id:'MET482',name:'Mechatronics',credits:3,term:7,cat:'major',prereq:['MET382','ECET369']},
+      {id:'MFET471',name:'Electric Machines',credits:3,term:7,cat:'major',prereq:['ECET224']},
+      {id:'MFET480',name:'Engineering Technology Capstone I',credits:3,term:7,cat:'major',prereq:['MET482','MFET361'],critical:true},
+      {id:'AdvOralSel',name:'Advanced Oral Communication Selective',credits:3,term:7,cat:'elective',prereq:['OralComm']},
+      {id:'ConcElec3',name:'Optional Concentration Selective or Elective III',credits:3,term:7,cat:'elective',prereq:[]},
+
+      {id:'ENGT481',name:'Engineering Technology Capstone II',credits:3,term:8,cat:'major',prereq:['MFET480'],critical:true},
+      {id:'ECET337',name:'Continuous Systems Analysis and Design',credits:3,term:8,cat:'major',prereq:['ECET279']},
+      {id:'FreeElecMet',name:'Elective',credits:4,term:8,cat:'elective',prereq:[]},
+      {id:'BSSFound',name:'Human Cultures: Behavioral/Social Sciences (UCC: BSS)',credits:3,term:8,cat:'elective',prereq:[]},
+      {id:'AIComp',name:'AI Working Competency (UCC: AI)',credits:1,term:8,cat:'elective',prereq:[]},
+    ]
+  },
+
 };
 
 const GRADE_POINTS = {'A':4,'A-':3.67,'B+':3.33,'B':3,'B-':2.67,'C+':2.33,'C':2,'C-':1.67,'D':1,'F':0};
@@ -312,11 +372,51 @@ let state = { major:'ie', progress: {} };
 const STORAGE_KEY = 'purdue-planner-state-v2';
 const hasArtifactStorage = typeof window !== 'undefined' && !!window.storage;
 
+// Fall 2026 meeting times, pre-filled from the student's actual registered
+// schedule. Room codes left blank ('') where the source schedule screenshot
+// was cropped/unreadable — fill those in via the Weekly Timetable inputs.
+// Only applied once, the first time a major's progress object is created
+// (i.e. a brand-new browser with nothing saved yet) — never overwrites
+// anything the student has already edited or saved.
+const DEFAULT_SCHEDULE_SEED = {
+  ENGR131: [ {label:'Studio', days:['T','R'], start:'13:30', end:'15:20', room:'LMBS 3261A/B'} ],
+  MA161:   [ {label:'Lecture / Recitation', days:['M','T','W','R','F'], start:'15:30', end:'16:20', room:''} ],
+  CHM115:  [
+    {label:'Lecture', days:['T','R'], start:'16:30', end:'17:20', room:''},
+    {label:'Recitation', days:['W'], start:'13:30', end:'14:20', room:'BRWN 6100'},
+    {label:'Lab (CHM 11520)', days:['T'], start:'07:30', end:'10:20', room:'CHAS 2060'}
+  ],
+  COMM1:   [ {label:'Lecture', days:['M','W','F'], start:'10:30', end:'11:20', room:''} ]
+};
+
+// Idempotent: only fills in a course if it isn't already completed and
+// doesn't already have times set (so it never clobbers anything the
+// student has entered or edited themselves, on this visit or a past one).
+function seedDefaultSchedule(p){
+  const courses = PROGRAMS[state.major].courses;
+  let changed = false;
+  Object.keys(DEFAULT_SCHEDULE_SEED).forEach(id=>{
+    if(!courses.some(c=>c.id===id)) return; // this major doesn't have that course id
+    if(p.completed[id]) return; // already marked complete — don't touch
+    const hasTimes = p.times[id] && p.times[id].length>0;
+    if(p.inprogress[id] && hasTimes) return; // already set up — leave it alone
+    if(!p.inprogress[id]){ p.inprogress[id] = true; changed = true; }
+    if(!hasTimes){
+      p.times[id] = DEFAULT_SCHEDULE_SEED[id].map(m=>({label:m.label, days:m.days.slice(), start:m.start, end:m.end, room:m.room}));
+      changed = true;
+    }
+  });
+  return changed;
+}
+
 function getProgress(){
   if(!state.progress[state.major]){ state.progress[state.major] = {completed:{}, grades:{}, inprogress:{}, predicted:{}, times:{}}; }
   const p = state.progress[state.major];
   if(!p.inprogress){ p.inprogress = {}; }
   if(!p.predicted){ p.predicted = {}; }
+  if(!p.times){ p.times = {}; }
+  if(!p.completed){ p.completed = {}; }
+  if(seedDefaultSchedule(p)){ saveState(); }
   return p;
 }
 
@@ -489,7 +589,7 @@ function renderTimetable(nextSemCourses, prog){
 
   nextSemCourses.forEach(c=>{
     const meetings = getCourseMeetings(prog, c.id);
-    if(meetings.length===0){ meetings.push({label:'', days:[], start:'', end:''}); }
+    if(meetings.length===0){ meetings.push({label:'', days:[], start:'', end:'', room:''}); }
 
     const group = document.createElement('div');
     group.className = 'tt-course-group';
@@ -510,6 +610,7 @@ function renderTimetable(nextSemCourses, prog){
         <input type="time" class="tt-time-input tt-start" data-course="${c.id}" data-idx="${idx}" value="${m.start||''}">
         <span style="color:var(--muted-dim);font-size:11px;">–</span>
         <input type="time" class="tt-time-input tt-end" data-course="${c.id}" data-idx="${idx}" value="${m.end||''}">
+        <input type="text" class="tt-meeting-room-input" data-course="${c.id}" data-idx="${idx}" placeholder="Room (e.g. CHAS 2060)" value="${m.room||''}">
         ${meetings.length>1?`<button type="button" class="tt-remove-btn" data-course="${c.id}" data-idx="${idx}" title="Remove this meeting">×</button>`:''}
       `;
       group.appendChild(row);
@@ -558,6 +659,15 @@ function renderTimetable(nextSemCourses, prog){
       saveState();
     });
   });
+  inputsEl.querySelectorAll('.tt-meeting-room-input').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      const cid = inp.getAttribute('data-course');
+      const idx = parseInt(inp.getAttribute('data-idx'),10);
+      getCourseMeetings(prog, cid)[idx].room = inp.value;
+      saveState();
+      renderTimetableGrid(nextSemCourses, prog);
+    });
+  });
   inputsEl.querySelectorAll('.tt-remove-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const cid = btn.getAttribute('data-course');
@@ -570,7 +680,7 @@ function renderTimetable(nextSemCourses, prog){
   inputsEl.querySelectorAll('.tt-add-btn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const cid = btn.getAttribute('data-course');
-      getCourseMeetings(prog, cid).push({label:'', days:[], start:'', end:''});
+      getCourseMeetings(prog, cid).push({label:'', days:[], start:'', end:'', room:''});
       saveState();
       renderTimetable(nextSemCourses, prog);
     });
@@ -632,7 +742,7 @@ function renderTimetableGrid(courses, prog){
       const color = ttCourseColor(b.course.id);
       const sub = b.m.label ? b.m.label : (b.course.id);
       html += `<div class="tt-block ${b.conflict?'conflict':''}" style="top:${top}px;height:${height}px;background:color-mix(in srgb, ${color} 18%, var(--bg-panel));border-color:${color};">
-        <b>${b.course.id}</b>${b.m.label?' <i>('+b.m.label+')</i>':''}<br>${b.m.start}–${b.m.end}
+        <b>${b.course.id}</b>${b.m.label?' <i>('+b.m.label+')</i>':''}<br>${b.m.start}–${b.m.end}${b.m.room?`<span class="tt-block-room">${b.m.room}</span>`:''}
       </div>`;
     });
     html += '</div>';
@@ -797,6 +907,7 @@ function generateICS(courses, prog, termDates){
       lines.push('DTEND:'+icsDateTime(dtstartDate,eh,em));
       lines.push('RRULE:FREQ=WEEKLY;BYDAY='+byday+';UNTIL='+untilStr);
       lines.push('SUMMARY:'+summary);
+      if(t.room) lines.push('LOCATION:'+t.room.replace(/[\r\n,;]/g,' '));
       lines.push('END:VEVENT');
     });
   });
