@@ -16,7 +16,12 @@
     }
   });
 
-  if ('serviceWorker' in navigator) {
+  const isEmbedded = (function () {
+    try { return new URLSearchParams(location.search).get('embed') === '1' || window.self !== window.top; }
+    catch (e) { return true; }
+  })();
+
+  if (!isEmbedded && 'serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     });

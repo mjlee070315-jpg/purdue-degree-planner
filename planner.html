@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>if(new URLSearchParams(location.search).get('embed')==='1'){document.documentElement.classList.add('embed-mode');}</script>
 <title>Planner — Purdue Engineering Degree Path Optimizer</title>
 <meta name="description" content="Build and optimize your Purdue engineering course plan — pick a major, check off completed courses, and get a provably optimal semester-by-semester roadmap.">
 <link rel="canonical" href="https://mjlee070315-jpg.github.io/purdue-degree-planner/planner.html">
@@ -239,7 +240,14 @@
 <script src="planner.js"></script>
 <script>initPlanner();</script>
 <script type="module" src="cpm3d.js"></script>
-<script data-goatcounter="https://minjaelee.goatcounter.com/count"
-        async src="//gc.zgo.at/count.js"></script>
+<script>
+if(new URLSearchParams(location.search).get('embed')!=='1'){
+  var gc = document.createElement('script');
+  gc.async = true;
+  gc.src = '//gc.zgo.at/count.js';
+  gc.setAttribute('data-goatcounter', 'https://minjaelee.goatcounter.com/count');
+  document.body.appendChild(gc);
+}
+</script>
 </body>
 </html>

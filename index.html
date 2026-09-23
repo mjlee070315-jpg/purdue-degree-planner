@@ -50,242 +50,94 @@
 
 <nav class="site-nav">
   <div class="wrap">
-    <a class="brand" href="index.html"><b>SCP</b> / Smart Course Planner</a>
-    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
-    <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#model">Model</a>
-      <a href="#complexity">Complexity</a>
-      <a href="#features">Features</a>
-      <a href="planner.html" class="cta">Open Planner</a>
-    </div>
+    <a class="brand" href="index.html">Smart Course Planner</a>
+    <a href="planner.html" class="nav-open-btn">Open Planner</a>
   </div>
 </nav>
 
 <div class="hero">
-  <div class="hero-bg" aria-hidden="true">
-    <svg viewBox="0 0 1200 460" xmlns="http://www.w3.org/2000/svg">
-      <rect x="40" y="60" width="150" height="70" rx="6" fill="#CFB991"/>
-      <rect x="210" y="40" width="130" height="100" rx="6" fill="#7C9AAB"/>
-      <rect x="360" y="90" width="160" height="60" rx="6" fill="#7FA97F"/>
-      <rect x="60" y="180" width="120" height="90" rx="6" fill="#B5502F"/>
-      <rect x="200" y="200" width="150" height="70" rx="6" fill="#CFB991"/>
-      <rect x="900" y="50" width="140" height="90" rx="6" fill="#7C9AAB"/>
-      <rect x="760" y="90" width="120" height="60" rx="6" fill="#CFB991"/>
-      <rect x="1020" y="170" width="130" height="100" rx="6" fill="#7FA97F"/>
-      <rect x="850" y="210" width="140" height="70" rx="6" fill="#B5502F"/>
-      <rect x="980" y="320" width="150" height="80" rx="6" fill="#CFB991"/>
-      <rect x="90" y="310" width="140" height="80" rx="6" fill="#7C9AAB"/>
-      <rect x="270" y="330" width="120" height="60" rx="6" fill="#B5502F"/>
-      <rect x="620" y="330" width="150" height="70" rx="6" fill="#7FA97F"/>
-      <rect x="440" y="30" width="130" height="80" rx="6" fill="#7C9AAB"/>
-    </svg>
-  </div>
   <div class="hero3d" id="hero3d" aria-hidden="true"></div>
   <div class="wrap hero-content">
-    <div class="eyebrow"><span class="live-dot"></span> Personal project · Engineering @ Purdue</div>
-    <h1 class="hero-title">Smart Course Planner</h1>
-    <p class="hero-tagline">Turning "when do I graduate?" into a constraint satisfaction problem — with a provable answer.</p>
-    <p class="subtitle">Built around seven real Purdue engineering curricula — Industrial, Mechanical, Electrical, Civil, and Chemical Engineering, Mechatronics Engineering Technology, plus Computer Science. Instead of manually checking prerequisites and credit caps every semester, it models each degree as a dependency graph, solves for the fastest feasible path to graduation, and proves — mathematically, not just empirically — how close that path is to optimal.</p>
-    <div class="hero-ctas">
-      <a href="planner.html" class="btn btn-primary">Build Your Course Plan →</a>
-      <a href="#model" class="btn btn-outline">See how it works</a>
-    </div>
-    <div class="hero-meta">
-      <div class="hero-meta-item"><div class="n">7</div><div class="l">Majors modeled</div></div>
-      <div class="hero-meta-item"><div class="n">285</div><div class="l">Courses across all programs</div></div>
-      <div class="hero-meta-item"><div class="n">12–19</div><div class="l">Adjustable credit cap</div></div>
-      <div class="hero-meta-item"><div class="n">$0</div><div class="l">Free, no account, no ads</div></div>
-    </div>
+    <h1 class="hero-title" data-reveal-hero>Smart Course<br>Planner.</h1>
+    <p class="hero-tagline" data-reveal-hero>Turning "when do I graduate?" into a math problem — with a provable answer.</p>
+    <a href="planner.html" class="btn btn-primary btn-lg" data-reveal-hero>Build Your Plan</a>
+    <p class="hero-note" data-reveal-hero>Free. No account. Seven Purdue majors today — every major, eventually.</p>
   </div>
 </div>
 
-<section id="about">
+<section class="live-preview">
   <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">00 — Why I Built This</div>
-      <div class="section-title">Two ordinary frustrations, one system.</div>
-      <p class="section-body">I'm a First-Year Engineering student at Purdue, applying to transfer to another university, and this project came out of two very ordinary frustrations. First, just checking my own course plan meant logging into MyPurdue's DegreeWorks — every time, through a portal, with no quick way to just glance at where I stood. Second, and more specific to being in FYE: I had to choose a major without any real way to compare what each one actually required, or how the paths differed in length and structure. Industrial Engineering is what I'm most drawn to, so it's the major I built out first and in the most depth — the other six exist so I could compare paths side by side, not because I was undecided about IE itself.</p>
-      <p class="section-body" style="margin-top:14px;">Building it taught me two things I'd only had in the abstract before: how to take operations-research concepts I'd read about — critical path method, greedy scheduling, combinatorial relaxation bounds — and apply them to a problem that was actually mine, with real prerequisite data and real constraints. And how to take a genuinely messy set of requirements — seven different majors, a live weekly timetable, a real academic calendar, GPA projection — and design them as one coherent system instead of separate one-off scripts.</p>
+    <h2 data-reveal>The real thing. Not a mockup.</h2>
+    <p class="preview-caption" data-reveal>This is the actual planner, live — scroll and click around right here.</p>
+    <div class="browser-frame" data-reveal>
+      <div class="browser-bar">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="browser-url">smart-course-planner — planner.html</span>
+      </div>
+      <iframe src="planner.html?embed=1" title="Live Smart Course Planner preview" loading="lazy"></iframe>
     </div>
   </div>
 </section>
 
-<section id="problem">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">01 — The Problem</div>
-      <div class="section-title">Every engineering student re-derives the same schedule by hand.</div>
-      <p class="section-body">Purdue's First-Year Engineering program lets students explore majors before declaring — which is great for exploration, but it means the actual path from "undecided" to a specific degree is buried across catalog PDFs, prerequisite chains, and credit-cap rules that most students only discover by trial and error each advising cycle, and that path looks completely different depending which major you land on. The underlying question — "if I take X credits a semester, how many semesters until I graduate?" — is a scheduling problem with real structure: a dependency graph and a capacity constraint, repeated across seven different degree structures. That structure is exactly what industrial engineers are trained to model.</p>
-    </div>
+<section class="story">
+  <div class="wrap wrap-narrow">
+    <h2 data-reveal>One question, buried in PDFs.</h2>
+    <p data-reveal>Purdue's First-Year Engineering program lets you explore before declaring — which is great, except comparing majors means digging through catalog PDFs and prerequisite chains by hand, one advising cycle at a time. I'm an FYE student who got tired of doing that math myself, so I built the tool that does it for me instead.</p>
   </div>
 </section>
 
-<section id="model">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">02 — The Model</div>
-      <div class="section-title">Framed as a scheduling optimization, not a checklist.</div>
-      <p class="section-body">Each of the seven degrees is represented as its own directed acyclic graph — 40 to 43 courses apiece. Solving "what should I take, and when" is a lightweight relative of an integer program:</p>
-    </div>
-    <div class="model-grid">
-      <div class="model-cell">
-        <div class="k">Decision Variable</div>
-        <div class="v">x[course, semester] ∈ {0, 1}</div>
-        <p>Whether a given course is taken in a given semester.</p>
-      </div>
-      <div class="model-cell">
-        <div class="k">Constraints</div>
-        <div class="v">prereqs(c) ⊆ completed-before(s)<br>Σ credits(s) ≤ cap</div>
-        <p>A course can't be scheduled until every prerequisite lands in a strictly earlier semester, and no semester exceeds the credit cap the student sets.</p>
-      </div>
-      <div class="model-cell">
-        <div class="k">Objective</div>
-        <div class="v">minimize Σ semesters</div>
-        <p>Reach graduation in as few semesters as possible without violating the constraints above.</p>
-      </div>
-    </div>
-    <p class="section-body" style="margin-top:26px;">The planner solves this with a <b>greedy topological scheduler</b> rather than a true ILP solver: at each step it computes the longest remaining dependency chain for every unfinished course (its distance from the capstone), and prioritizes courses on that critical path so they never become the bottleneck. Unlike a plain heuristic, though, the tool doesn't just trust the greedy result — it checks it, and can verify it exactly on demand. See the Complexity section below.</p>
+<section class="think">
+  <div class="wrap wrap-narrow">
+    <h2 data-reveal>Not a checklist. A proof.</h2>
+    <p data-reveal>Each major is modeled as a dependency graph — courses as nodes, prerequisites as edges — and scheduling it is a lightweight relative of an integer program:</p>
+    <pre class="eq-panel" data-reveal>x[course, semester] ∈ {0, 1}
+subject to   prereqs(c) ⊆ completed-before(s)
+             Σ credits(s) ≤ cap
+minimize     Σ semesters</pre>
+    <p data-reveal>A greedy scheduler solves it by always prioritizing the courses on the longest remaining dependency chain. Then it checks its own work: every schedule is measured against a mathematical lower bound, and when the two match, the plan is <i>proven</i> optimal — not just plausible. Run an exact branch-and-bound search on demand, or open the whole degree as an orbitable 3D critical-path network.</p>
   </div>
 </section>
 
-<section id="complexity">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">03 — Complexity &amp; Optimality</div>
-      <div class="section-title">Proving the schedule is good, not just hoping it is.</div>
-      <p class="section-body">This scheduling problem — assign tasks with precedence constraints into the fewest possible capacity-limited batches — is a variant of <b>precedence-constrained scheduling</b> (related to P|prec|C<sub>max</sub> in scheduling-theory notation), which is <b>NP-hard</b> in general. For a graph with 40+ courses and a dozen-plus eligible electives per semester, brute-forcing every possible assignment isn't computationally realistic in a browser. Running an exact ILP solver (OR-Tools, CBC) would work, but at this scale a much cheaper technique does almost the same job:</p>
-    </div>
-    <div class="model-grid">
-      <div class="model-cell">
-        <div class="k">Lower Bound 1 — Capacity</div>
-        <div class="v">⌈ Σ remaining credits / cap ⌉</div>
-        <p>No schedule can finish faster than total remaining credits divided by the per-semester cap, rounded up — regardless of prerequisites.</p>
-      </div>
-      <div class="model-cell">
-        <div class="k">Lower Bound 2 — Critical Path</div>
-        <div class="v">longest chain + 1</div>
-        <p>If course E requires D requires C requires B requires A, that's 5 semesters minimum, no matter how much room is left in the credit cap.</p>
-      </div>
-      <div class="model-cell">
-        <div class="k">The Check</div>
-        <div class="v">greedy result == max(LB1, LB2) ?</div>
-        <p>If the greedy schedule matches the larger of the two bounds, it is <i>provably</i> optimal — no better schedule can exist, full stop.</p>
-      </div>
-    </div>
-    <p class="section-body" style="margin-top:26px;">This is a classic <b>combinatorial relaxation bound</b>: instead of solving the hard problem exactly, solve two easy relaxations of it and use whichever gives the stronger (larger) bound. When the lower bound doesn't quite close the gap, the planner can also run a real <b>branch-and-bound exact search</b> on demand — bounded to a short time budget, and honest about it when the search space is too large to finish exhaustively.</p>
-    <p class="section-body" style="margin-top:16px;">The planner also runs a full <b>Critical Path Method (CPM)</b> analysis on each major — real forward/backward-pass Early Start, Early Finish, Late Start, Late Finish, and slack for every course, rendered as an interactive network diagram (2D or fully orbitable 3D) with the zero-slack critical path highlighted. CPM assumes unlimited parallel course-taking, so it's a genuinely different (and looser) relaxation than the credit-capped roadmap: comparing the two side by side — theoretical fastest path vs. realistic, resource-constrained path — is itself the kind of relaxation-vs-reality comparison operations research is built on.</p>
-  </div>
-</section>
-
-<section id="features">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">04 — Features</div>
-      <div class="section-title">What the planner actually does.</div>
-    </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="7.5"/><path d="M13 7l-2 5-4 1 2-5 4-1z"/><circle cx="10" cy="10" r="0.6" fill="currentColor" stroke="none"/></svg></span>
+<section class="feature-list">
+  <div class="wrap wrap-narrow">
+    <h2 data-reveal>What it does.</h2>
+    <div class="flist" data-reveal-group>
+      <div class="fitem" data-reveal>
         <h3>Seven majors, one tool</h3>
-        <p>Switch between IE, ME, ECE, CS, ChemE, CE, and Mechatronics with one click — each with its own real course graph, progress tracking, and optimality check.</p>
+        <p>IE, ME, ECE, CS, ChemE, CE, and Mechatronics — each a real course graph with its own progress tracking. More are being added.</p>
       </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4" cy="10" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="10" cy="16" r="2"/><circle cx="16" cy="10" r="2"/><path d="M6 10h8M5.4 8.6l3.2-3.2M5.4 11.4l3.2 3.2M11.4 6.8l3.2 3.2M11.4 13.2l3.2-3.2"/></svg></span>
+      <div class="fitem" data-reveal>
+        <h3>Provably optimal scheduling</h3>
+        <p>Drag the credit cap and the whole plan re-solves instantly, checked against a combinatorial lower bound on every change.</p>
+      </div>
+      <div class="fitem" data-reveal>
         <h3>3D critical-path network</h3>
-        <p>The CPM diagram isn't just a static picture — flip it into an orbitable 3D view of the whole dependency graph, critical path glowing, everything else fading into the background.</p>
+        <p>Orbit the full dependency graph in space — critical path glowing gold, everything else fading into the background.</p>
       </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 2v2.2M10 15.8V18M18 10h-2.2M4.2 10H2M15.5 4.5l-1.6 1.6M6.1 13.9l-1.6 1.6M15.5 15.5l-1.6-1.6M6.1 6.1L4.5 4.5"/><circle cx="10" cy="10" r="3"/></svg></span>
-        <h3>Live re-scheduling</h3>
-        <p>Drag the credit-cap slider and the entire remaining semester plan re-solves instantly — answers "how many semesters if I take 18 credits?" directly.</p>
-      </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="7.5"/><path d="M6.5 10.3l2.2 2.2 4.8-5"/></svg></span>
-        <h3>Optimality verification</h3>
-        <p>Every schedule is checked against a combinatorial lower bound, with an on-demand branch-and-bound exact search — provably optimal, not just "probably fine."</p>
-      </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2.5v15"/><path d="M4 3.5h11l-2.5 3 2.5 3H4"/></svg></span>
-        <h3>Graduation projection &amp; GPA</h3>
-        <p>Combines completed courses with the optimizer's remaining path to project an actual semester and year of graduation, plus current and projected GPA.</p>
-      </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="4" width="15" height="13" rx="1"/><path d="M2.5 8h15M7 2.5v3M13 2.5v3"/><circle cx="10" cy="12.5" r="1.6" fill="currentColor" stroke="none"/></svg></span>
-        <h3>Timetable &amp; calendar export</h3>
-        <p>Build a weekly class-time grid with conflict detection, then export the whole semester — classes plus breaks and finals — as a real .ics calendar file.</p>
-      </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="3" width="6" height="14" rx="1"/><rect x="10.5" y="7" width="6" height="10" rx="1"/></svg></span>
-        <h3>Compare all seven majors</h3>
-        <p>A fresh-start comparison table across every major at your credit cap — total credits, semesters, lower bound, and CPM length side by side.</p>
-      </div>
-      <div class="feature-card">
-        <span class="icon"><svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 10.5l2.5 2.5L14 7"/><circle cx="10" cy="10" r="7.5"/></svg></span>
+      <div class="fitem" data-reveal>
         <h3>Share your exact plan</h3>
-        <p>Generate a link that encodes your major, completed courses, and grades — send it to a friend or advisor and they open it exactly as you built it.</p>
+        <p>One link encodes your major, completed courses, and grades — a friend or advisor opens it exactly as you built it.</p>
       </div>
     </div>
+    <p class="fmore" data-reveal>Plus: GPA projection, a weekly timetable with conflict detection, and one-click .ics calendar export.</p>
   </div>
 </section>
 
-<section id="install">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">05 — Use It Like An App</div>
-      <div class="section-title">Free, installable, and yours to keep.</div>
-      <p class="section-body">No account, no email capture, no ads, no server storing your grades — everything lives in your own browser. Install it to your phone or laptop home screen for one-tap access before every advising meeting, and it keeps working even with a spotty connection.</p>
-    </div>
-    <div class="stack-row">
-      <span class="stack-chip">Installable (PWA)</span>
-      <span class="stack-chip">Works offline</span>
-      <span class="stack-chip">No account required</span>
-      <span class="stack-chip">Your data never leaves your device</span>
-      <span class="stack-chip">Open source, MIT licensed</span>
-    </div>
-  </div>
-</section>
-
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">06 — Data &amp; Stack</div>
-      <div class="section-title">Sourced from Purdue's own catalog and department handbooks.</div>
-      <p class="section-body">Course lists, credit hours, and prerequisite chains come from Purdue's published plans of study and department curriculum handbooks for First-Year Engineering, Industrial, Mechanical, Electrical, Civil, and Chemical Engineering, Mechatronics Engineering Technology, and Computer Science. It's an unofficial planning aid, not a replacement for myPurduePlan / DegreeWorks or an academic advisor.</p>
-    </div>
-    <div class="stack-row">
-      <span class="stack-chip">Vanilla JS</span>
-      <span class="stack-chip">No build step</span>
-      <span class="stack-chip">Three.js (3D views)</span>
-      <span class="stack-chip">Greedy graph scheduling</span>
-      <span class="stack-chip">Combinatorial lower-bound verification</span>
-      <span class="stack-chip">Static — deployable on GitHub Pages</span>
-    </div>
-  </div>
-</section>
-
-<section id="feedback">
-  <div class="wrap">
-    <div class="section-head">
-      <div class="section-num">07 — Get Involved</div>
-      <div class="section-title">Studying a major that isn't modeled yet, or found a data error?</div>
-      <p class="section-body">This is a small, independently maintained project, kept accurate by people actually using it. If a prerequisite looks wrong, a course is missing, or you'd like to see another Purdue major added, the fastest way to reach me is directly.</p>
-    </div>
-    <div class="hero-ctas" style="margin-top:4px;">
-      <a href="https://github.com/mjlee070315-jpg/purdue-degree-planner/issues/new" target="_blank" rel="noopener" class="btn btn-outline">Report an issue on GitHub →</a>
-      <a href="mailto:mjlee070315@gmail.com?subject=Smart%20Course%20Planner" class="btn btn-outline">Email feedback →</a>
-    </div>
+<section class="cta-band">
+  <div class="wrap wrap-narrow">
+    <h2 data-reveal>Stop guessing your graduation date.</h2>
+    <a href="planner.html" class="btn btn-primary btn-lg" data-reveal>Build Your Plan →</a>
   </div>
 </section>
 
 <footer class="site-footer">
   <div class="wrap">
-    <p>Smart Course Planner is an independent student project and is not affiliated with or endorsed by Purdue University. Curriculum data may change — verify current requirements at catalog.purdue.edu.</p>
-    <p><a href="planner.html">Open Planner →</a> &nbsp;·&nbsp; <a href="https://minjaelee.goatcounter.com" target="_blank" rel="noopener">Live visitor stats →</a></p>
+    <p>Independent student project, not affiliated with or endorsed by Purdue University — verify requirements at catalog.purdue.edu. Free, installable, open source (MIT), and your data never leaves your device.</p>
+    <p><a href="planner.html">Open Planner →</a> &nbsp;·&nbsp; <a href="https://github.com/mjlee070315-jpg/purdue-degree-planner/issues/new" target="_blank" rel="noopener">Report an issue</a> &nbsp;·&nbsp; <a href="mailto:mjlee070315@gmail.com?subject=Smart%20Course%20Planner">Email feedback</a> &nbsp;·&nbsp; <a href="https://minjaelee.goatcounter.com" target="_blank" rel="noopener">Visitor stats</a></p>
   </div>
 </footer>
 
-<script src="site.js" defer></script>
+<script src="motion.js" defer></script>
 <script type="module" src="hero3d.js"></script>
 <script data-goatcounter="https://minjaelee.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
