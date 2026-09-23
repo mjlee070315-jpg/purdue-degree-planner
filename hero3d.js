@@ -27,7 +27,8 @@ function initHero3D(mount) {
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-  camera.position.set(0, 0.6, 15);
+  const CAMERA_BASE_Z = 15;
+  camera.position.set(0, 0.6, CAMERA_BASE_Z);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setClearColor(0x000000, 0);
@@ -167,10 +168,18 @@ function initHero3D(mount) {
     requestAnimationFrame(animate);
     if (!running) return;
     const t = clock.getElapsedTime();
-    curRotY += (targetRotY + Math.sin(t * 0.08) * 0.12 - curRotY) * 0.03;
-    curRotX += (targetRotX - curRotX) * 0.03;
+    // slow autonomous orbit + pointer parallax layered on top, so the
+    // scene stays alive as a cinematic background even with no input
+    curRotY += (targetRotY + Math.sin(t * 0.065) * 0.22 - curRotY) * 0.025;
+    curRotX += (targetRotX + Math.sin(t * 0.05) * 0.05 - curRotX) * 0.025;
     group.rotation.y = curRotY;
     group.rotation.x = curRotX;
+
+    // slow dolly breathing — a gentle push in/out for depth, plus a
+    // faint vertical drift, like a camera on a very slow slider
+    camera.position.z = CAMERA_BASE_Z + Math.sin(t * 0.09) * 0.9;
+    camera.position.y = 0.6 + Math.sin(t * 0.07) * 0.35;
+    camera.lookAt(0, 0, 0);
 
     // gentle critical-path pulse
     const pulse = 0.85 + Math.sin(t * 1.4) * 0.15;
