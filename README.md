@@ -30,11 +30,11 @@ time with no quick way to just glance at where I stood, and — more
 specific to transferring out of FYE — I had to choose a major without any
 real way to compare what each one actually required. Industrial
 Engineering is what I'm most drawn to, so it's the major built out first
-and in the most depth; the other five exist so I could compare paths side
+and in the most depth; the other six exist so I could compare paths side
 by side. Building it was a chance to apply operations-research concepts
 I'd only read about — critical path method, greedy scheduling,
 combinatorial relaxation bounds — to a problem that was actually mine, and
-to design a genuinely messy set of requirements (six majors, a live
+to design a genuinely messy set of requirements (seven majors, a live
 timetable, a real academic calendar) as one coherent system.
 
 ## Screenshots
@@ -52,19 +52,21 @@ Snipping Tool, save into a `docs/` folder, then:_
 ## Skills demonstrated
 
 Operations research (CPM, greedy scheduling, combinatorial bounds) ·
-graph algorithms (topological sort, longest-path) · data modeling (6
-independent curricula, 245 courses) · frontend engineering (vanilla
+graph algorithms (topological sort, longest-path) · data modeling (7
+independent curricula, 285 courses) · frontend engineering (vanilla
 JS/CSS, no framework) · SVG data visualization · date/calendar math ·
-iCalendar (RFC 5545) generation · UX design for a technical audience
+iCalendar (RFC 5545) generation · zero-dependency browser test suite ·
+UX design for a technical audience
 
 ## Pages
 
-`index.html` (project overview) · `planner.html` (the tool)
+`index.html` (project overview) · `planner.html` (the tool) · `tests.html` (test suite)
 
 ## The model
 
-Each major is its own directed acyclic graph (40–43 courses), sourced from
-Purdue's published plans of study and department handbooks.
+Each major is its own directed acyclic graph (40–43 courses, 285 total
+across all seven), sourced from Purdue's published plans of study and
+department handbooks.
 
 - **Decision variable:** `x[course, semester] ∈ {0,1}`
 - **Constraints:** every prerequisite of a course must be scheduled in a
@@ -90,9 +92,9 @@ bound** on every update:
 If the greedy result matches the bound, the schedule is **provably
 optimal**. If not, the gap is shown honestly — closing it exactly is
 NP-hard at this scale, but the greedy result is guaranteed within that gap
-of the true optimum. Run against all six majors at an 18-credit cap: IE,
-ME, ChemE, and CE come back provably optimal; ECE and CS land one semester
-above the bound.
+of the true optimum. Run against all seven majors at an 18-credit cap: IE,
+ME, ChemE, CE, and Mechatronics come back provably optimal; ECE and CS
+land one semester above the bound.
 
 ## Critical Path Method (CPM) network diagram
 
@@ -115,8 +117,8 @@ Three additions push the optimization story further:
   every credit cap from 12 to 19, showing exactly where more credits per
   semester stop shortening the plan (diminishing returns / the "elbow
   point").
-- **Major comparison table** — all six majors compared from a fresh start
-  at the current credit cap: total credits, semesters, lower bound,
+- **Major comparison table** — all seven majors compared from a fresh
+  start at the current credit cap: total credits, semesters, lower bound,
   optimality status, and CPM critical-path length side by side.
 - **Exact search (branch & bound)** — an on-demand button runs a real
   branch-and-bound solver: exhaustive subset enumeration per semester with
@@ -166,11 +168,13 @@ or Outlook.
 ```
 index.html       – landing page / project write-up, with a 3D "course constellation" hero
 planner.html     – the interactive planner (major selector, optimizer, CPM diagram, GPA calc)
+tests.html       – zero-dependency browser test suite for the algorithmic core + real course data
+tests.js         – the tests themselves (62 assertions: algorithms + all 7 majors' data)
 style.css        – shared design system
 planner.js       – course data for all 7 majors + scheduling engine + rendering
 hero3d.js        – landing-page 3D hero (Three.js, decorative)
 cpm3d.js         – planner-page 3D Critical Path Network view (Three.js, reuses computeCPM())
-site.js          – shared mobile nav + service worker registration
+site.js          – shared mobile nav, tab navigation, and service worker registration
 manifest.json / sw.js – PWA install + offline support
 vendor/three/    – vendored Three.js build + OrbitControls (no CDN dependency, no build step)
 robots.txt / sitemap.xml / og-image.png / icons/ – SEO & social-share assets
@@ -194,10 +198,15 @@ switching majors in the selector never loses your place.
 | Computer Science, BS | 40 | CS core + track system |
 | Chemical Engineering, BSChE | 40 | ChE undergrad program guide (2025–26) |
 | Civil Engineering, BSCE | 40 | CE curriculum (Purdue-portion of articulation plan) |
+| Mechatronics Engineering Technology, BS | 40 | MET plan of study |
 
 Elective and track slots (General Education, Technical Electives, CS Track
 Requirements, etc.) are shown as generic placeholders — swap in specific
-course titles once chosen.
+course titles once chosen. Credit totals and elective counts are modeled
+as closely as I could get them from published sources, but haven't been
+reconciled course-by-course against every catalog page for every major —
+see **Testing & data verification** below for what has and hasn't been
+independently checked.
 
 ## Analytics
 
@@ -221,6 +230,52 @@ custom domain.
    ```
 3. On GitHub: **Settings → Pages → Source → Deploy from a branch → `main` / root**.
 4. Live at `https://<your-username>.github.io/<repo-name>/` within a minute or two.
+
+## Testing & data verification
+
+`tests.html` runs a 62-assertion, zero-dependency test suite directly in
+the browser — no Node/npm, matching the rest of the project's philosophy.
+`planner.js` loads as a plain script; `tests.js` calls its functions
+straight off the global scope. It covers two different things:
+
+- **Algorithm correctness**, against small synthetic course graphs where
+  the right answer is known by hand: `longestPaths` on a linear chain and
+  on independent nodes; `computeCPM` on a linear chain, a diamond graph,
+  and a graph with a genuine slack branch; `buildSchedule`'s credit-cap,
+  prerequisite-ordering, and no-dropped/no-duplicated-course invariants;
+  and — the one that actually backs the "provably optimal" claim in the
+  UI — that `lowerBoundSemesters` never exceeds what the greedy scheduler
+  actually uses, on both a general graph and the two cases (credit-bound,
+  chain-bound) where the exact answer is analytically known.
+- **Real-data regression**, run against all seven majors' actual course
+  lists in `PROGRAMS`: every prerequisite id referenced actually exists,
+  no duplicate ids, no prerequisite cycles, a full from-scratch schedule
+  places every course exactly once without exceeding the 18-credit cap,
+  the lower bound never exceeds the real schedule length, and every
+  course has non-negative credits and a valid category.
+
+I ran this suite while writing it and it caught a real bug: one ECE test
+initially asserted credits must be strictly positive, which failed on
+`ECE 20000` ("Sophomore Seminar") — but that's a genuine 0-credit,
+pass/fail course in Purdue's actual curriculum, so the assertion itself
+was wrong and I loosened it to non-negative rather than "fixing" real data
+to satisfy a bad test.
+
+Separately, I spot-checked the Industrial Engineering plan (the most
+built-out major) against Purdue's official catalog planner
+(`catalog.purdue.edu`) and found one real data bug — a placeholder-looking
+`ECE200X` entry that should have been the actual course `ECE 20100`,
+"Linear Circuit Analysis I" — which is now fixed. That same check also
+surfaced two discrepancies I have **not** resolved: the site's IE total
+(127 credits) versus Purdue's official 123, and the modeled elective
+structure (3 Technical + 6 General) versus the official 5 Technical + 8
+General slots. I'm disclosing this rather than quietly patching it,
+because I only hand-verified IE in depth — the other six majors haven't
+had the same catalog-page-by-page treatment, so I'd rather be upfront
+about the boundary of what's actually been checked than imply a precision
+the data doesn't have. This is also why the in-app disclaimer banner
+above the planner links directly to myPurduePlan/DegreeWorks rather than
+just sitting in the footer.
 
 ## Data source & disclaimer
 

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test Suite — Smart Course Planner</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="wrap">
+    <a class="brand" href="index.html">Smart Course Planner</a>
+    <a href="planner.html" class="nav-open-btn">Open Planner</a>
+  </div>
+</nav>
+
+<section class="test-page">
+  <div class="wrap wrap-narrow">
+    <h1 class="test-title">Test suite</h1>
+    <p class="test-intro">
+      Zero-dependency browser tests for the algorithmic core — the CPM analysis, the greedy
+      scheduler, and the combinatorial lower bound the "provably optimal" claim rests on —
+      plus a structural regression check run against all seven majors' real course data.
+      No Node, no build step: <code>planner.js</code> loads as a plain script and this file
+      calls its functions directly.
+    </p>
+    <div id="testSummary" class="test-summary">Running…</div>
+    <div id="testResults" class="test-results"></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Independent student project, not affiliated with or endorsed by Purdue University — verify requirements at catalog.purdue.edu.</p>
+    <p><a href="index.html">← Back home</a> &nbsp;·&nbsp; <a href="planner.html">Open Planner →</a> &nbsp;·&nbsp; <a href="https://github.com/mjlee070315-jpg/purdue-degree-planner" target="_blank" rel="noopener">View source</a></p>
+  </div>
+</footer>
+
+<script src="planner.js"></script>
+<script src="tests.js"></script>
+</body>
+</html>

@@ -36,7 +36,7 @@ const PROGRAMS = {
       {id:'IE336',name:'Operations Research – Stochastic Models',credits:3,term:5,cat:'major',prereq:['IE330']},
       {id:'MA266',name:'Ordinary Differential Equations',credits:3,term:5,cat:'support',prereq:['MA162']},
       {id:'GE3',name:'General Education Elective III',credits:3,term:5,cat:'elective',prereq:[]},
-      {id:'ECE200X',name:'Electrical Engineering Fundamentals I',credits:3,term:6,cat:'support',prereq:['PHYS241']},
+      {id:'ECE201',name:'Linear Circuit Analysis I',credits:3,term:6,cat:'support',prereq:['PHYS241']},
       {id:'IE332',name:'Computing in Industrial Engineering',credits:3,term:6,cat:'major',prereq:['IE335']},
       {id:'IE370',name:'Manufacturing Processes I',credits:3,term:6,cat:'major',prereq:[]},
       {id:'IE383',name:'Integrated Production Systems I',credits:3,term:6,cat:'major',prereq:['IE335','IE336']},
