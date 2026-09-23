@@ -436,7 +436,78 @@ async function loadState(){
   }catch(e){ /* no saved state yet */ }
   if(!state.major || !PROGRAMS[state.major]){ state.major = 'ie'; }
   if(!state.progress){ state.progress = {}; }
+  checkIncomingSharedPlan();
   render();
+}
+
+// ============================================================
+// Share My Plan — encodes {major, completed, grades, inprogress,
+// predicted} (deliberately excluding personal timetable/room data)
+// into a URL so a friend or advisor can open the exact same plan.
+// ============================================================
+function encodeSharePlan(){
+  const prog = getProgress();
+  const payload = { v:1, major: state.major, completed: prog.completed, grades: prog.grades, inprogress: prog.inprogress, predicted: prog.predicted };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+}
+
+function decodeSharePlan(b64){
+  try{ return JSON.parse(decodeURIComponent(escape(atob(b64)))); }
+  catch(e){ return null; }
+}
+
+function buildShareUrl(){
+  const url = new URL(window.location.href);
+  url.hash = '';
+  url.searchParams.set('plan', encodeSharePlan());
+  return url.toString();
+}
+
+function showShareToast(msg){
+  const el = document.getElementById('shareToast');
+  if(!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(showShareToast._t);
+  showShareToast._t = setTimeout(()=>el.classList.remove('show'), 3400);
+}
+
+async function handleShareClick(){
+  const url = buildShareUrl();
+  try{
+    await navigator.clipboard.writeText(url);
+    showShareToast('Link copied — paste it anywhere to share this exact plan.');
+  }catch(e){
+    window.prompt('Copy this link to share your plan:', url);
+  }
+}
+
+function checkIncomingSharedPlan(){
+  let params;
+  try{ params = new URLSearchParams(window.location.search); }catch(e){ return; }
+  const b64 = params.get('plan');
+  if(!b64) return;
+  const data = decodeSharePlan(b64);
+  const cleanUrl = () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('plan');
+    window.history.replaceState({}, '', url.toString());
+  };
+  if(!data || !data.major || !PROGRAMS[data.major]){ cleanUrl(); return; }
+  const label = PROGRAMS[data.major].label;
+  const ok = window.confirm('Load a shared "'+label+'" plan?\n\nThis will replace your current saved progress for that major on this device. Choose Cancel to ignore it and keep browsing your own plan.');
+  if(ok){
+    state.major = data.major;
+    if(!state.progress[data.major]) state.progress[data.major] = {completed:{},grades:{},inprogress:{},predicted:{},times:{}};
+    const p = state.progress[data.major];
+    p.completed = data.completed || {};
+    p.grades = data.grades || {};
+    p.inprogress = data.inprogress || {};
+    p.predicted = data.predicted || {};
+    if(!p.times) p.times = {};
+    saveState();
+  }
+  cleanUrl();
 }
 
 let saveTimeout;
@@ -1767,6 +1838,9 @@ function initPlanner(){
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   });
+  const shareBtn = document.getElementById('sharePlanBtn');
+  if(shareBtn) shareBtn.addEventListener('click', handleShareClick);
+
   renderAssignments();
   loadState();
 }

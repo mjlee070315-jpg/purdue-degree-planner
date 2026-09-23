@@ -4,16 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Planner — Purdue Engineering Degree Path Optimizer</title>
+<meta name="description" content="Build and optimize your Purdue engineering course plan — pick a major, check off completed courses, and get a provably optimal semester-by-semester roadmap.">
+<link rel="canonical" href="https://mjlee070315-jpg.github.io/purdue-degree-planner/planner.html">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#121210">
+<meta property="og:title" content="Smart Course Planner — build your Purdue degree plan">
+<meta property="og:description" content="A constraint-based degree scheduler for seven Purdue engineering majors. Free, no login.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://mjlee070315-jpg.github.io/purdue-degree-planner/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script type="importmap">
+{ "imports": {
+    "three": "./vendor/three/three.module.min.js",
+    "three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
 </head>
 <body>
 
 <nav class="site-nav">
   <div class="wrap">
     <a class="brand" href="index.html"><b>SCP</b> / Smart Course Planner</a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <div class="nav-links">
       <a href="index.html#model">Model</a>
       <a href="index.html#features">Features</a>
@@ -80,7 +97,13 @@
   <div class="optimizer">
     <div class="optimizer-head">
       <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="3"/><path d="M10 2v2.2M10 15.8V18M18 10h-2.2M4.2 10H2M15.5 4.5l-1.6 1.6M6.1 13.9l-1.6 1.6M15.5 15.5l-1.6-1.6M6.1 6.1L4.5 4.5"/></svg>Schedule Optimizer</h2>
-      <span class="status-msg" id="saveStatus">progress saved locally to this browser</span>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <span class="status-msg" id="saveStatus">progress saved locally to this browser</span>
+        <button class="share-btn" id="sharePlanBtn" title="Copy a link that loads this exact plan for whoever opens it">
+          <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="15" cy="5" r="2.4"/><circle cx="5" cy="10" r="2.4"/><circle cx="15" cy="15" r="2.4"/><path d="M7.2 8.8l5.6-2.6M7.2 11.2l5.6 2.6"/></svg>
+          Share My Plan
+        </button>
+      </div>
     </div>
     <div class="optimizer-note">Check off courses as you complete them. The scheduler re-solves the remaining prerequisite graph on every change: it prioritizes courses on the longest remaining dependency chain (the critical path to the capstone), then packs each semester up to your credit cap. This is a greedy heuristic for what is really an integer program — decision variable <code>x[course, semester] ∈ {0,1}</code>, prerequisite + credit-cap constraints, objective: minimize semesters to graduation.</div>
     <div class="slider-row">
@@ -178,10 +201,18 @@
   <div class="cpm-wrap">
     <div class="cpm-head">
       <h2><svg class="icon-inline" aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="4" cy="10" r="2"/><circle cx="10" cy="4" r="2"/><circle cx="10" cy="16" r="2"/><circle cx="16" cy="10" r="2"/><path d="M6 10h8M5.4 8.6l3.2-3.2M5.4 11.4l3.2 3.2M11.4 6.8l3.2 3.2M11.4 13.2l3.2-3.2"/></svg>Critical Path Network (CPM)</h2>
-      <span class="cpm-badge" id="cpmBadge"></span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="cpm-badge" id="cpmBadge"></span>
+        <div class="cpm-view-toggle">
+          <button type="button" id="cpmView2dBtn" class="active">2D</button>
+          <button type="button" id="cpmView3dBtn">3D</button>
+        </div>
+      </div>
     </div>
     <div class="cpm-note">A real Critical Path Method analysis of the full degree — Early Start/Finish and Late Start/Finish computed for every course, assuming <i>unlimited</i> parallel course-taking (no credit cap). Courses with zero slack (gold, thick edges) form the critical path: delay any one of them and graduation slips. This differs from the credit-capped roadmap below, which is the realistic, resource-constrained version of the same problem.</div>
     <div class="cpm-scroll"><div id="cpmDiagram"></div></div>
+    <div id="cpmDiagram3D"></div>
+    <div class="cpm3d-hint">Drag to orbit · scroll to zoom · hover a course for ES/EF/LS/LF and slack.</div>
   </div>
 
   <div class="roadmap-label">
@@ -202,8 +233,12 @@
 
 </div>
 
+<div class="share-toast" id="shareToast"></div>
+
+<script src="site.js" defer></script>
 <script src="planner.js"></script>
 <script>initPlanner();</script>
+<script type="module" src="cpm3d.js"></script>
 <script data-goatcounter="https://minjaelee.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 </body>

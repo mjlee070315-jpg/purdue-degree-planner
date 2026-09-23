@@ -1,18 +1,26 @@
 # Smart Course Planner — Purdue Engineering Degree Path Optimizer
 
 ![Status](https://img.shields.io/badge/status-active-7FA97F)
-![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%2F%20HTML%20%2F%20CSS-CFB991)
-![Majors](https://img.shields.io/badge/majors%20modeled-6-CFB991)
+![Stack](https://img.shields.io/badge/stack-vanilla%20JS%20%2F%20HTML%20%2F%20CSS%20%2B%20Three.js-CFB991)
+![Majors](https://img.shields.io/badge/majors%20modeled-7-CFB991)
+![PWA](https://img.shields.io/badge/installable-PWA-CFB991)
 ![License](https://img.shields.io/badge/license-MIT-948D78)
 
 **Live demo:** https://mjlee070315-jpg.github.io/purdue-degree-planner/
 
-A constraint-based degree scheduler covering six Purdue engineering
+A constraint-based degree scheduler covering seven Purdue engineering
 curricula: Industrial, Mechanical, Electrical, Civil, and Chemical
-Engineering, plus Computer Science. Instead of manually tracking
-prerequisites and credit caps every semester, the planner models each
-degree as a dependency graph, solves for the fastest feasible path to
-graduation, and mathematically verifies how close that path is to optimal.
+Engineering, Mechatronics Engineering Technology, plus Computer Science.
+Instead of manually tracking prerequisites and credit caps every semester,
+the planner models each degree as a dependency graph, solves for the
+fastest feasible path to graduation, and mathematically verifies how close
+that path is to optimal.
+
+Installable as a PWA, works offline, free with no account — and the
+Critical Path Method network can be viewed as a fully orbitable 3D graph
+(Three.js), not just a static diagram. Generate a link that encodes your
+exact plan (major + completed courses + grades) to share with a friend or
+advisor via **Share My Plan**.
 
 ## Why I built this
 
@@ -156,15 +164,22 @@ or Outlook.
 ## Project structure
 
 ```
-index.html      – landing page / project write-up (about, problem, model, complexity, features)
-planner.html    – the interactive planner (major selector, optimizer, CPM diagram, GPA calc)
-style.css       – shared design system
-planner.js      – course data for all 6 majors + scheduling engine + rendering
-favicon.svg     – site icon
-LICENSE         – MIT license
+index.html       – landing page / project write-up, with a 3D "course constellation" hero
+planner.html     – the interactive planner (major selector, optimizer, CPM diagram, GPA calc)
+style.css        – shared design system
+planner.js       – course data for all 7 majors + scheduling engine + rendering
+hero3d.js        – landing-page 3D hero (Three.js, decorative)
+cpm3d.js         – planner-page 3D Critical Path Network view (Three.js, reuses computeCPM())
+site.js          – shared mobile nav + service worker registration
+manifest.json / sw.js – PWA install + offline support
+vendor/three/    – vendored Three.js build + OrbitControls (no CDN dependency, no build step)
+robots.txt / sitemap.xml / og-image.png / icons/ – SEO & social-share assets
+favicon.svg      – site icon
+LICENSE          – MIT license
 ```
 
-No build step, no dependencies — plain HTML/CSS/JS. Storage auto-detects
+No build step, no npm install required to run it — plain HTML/CSS/JS, with
+Three.js vendored as a static file for the 3D views. Storage auto-detects
 its environment (`localStorage` in a normal browser, `window.storage` if
 run inside Claude's artifact runtime). Progress is stored per-major, so
 switching majors in the selector never loses your place.
