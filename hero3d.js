@@ -156,7 +156,7 @@ function initHero3D(mount) {
 
   const normalGeo = new THREE.BufferGeometry();
   normalGeo.setAttribute('position', new THREE.Float32BufferAttribute(normalPositions, 3));
-  const normalMat = new THREE.LineBasicMaterial({ color: GOLD, transparent: true, opacity: 0.16 });
+  const normalMat = new THREE.LineBasicMaterial({ color: GOLD, transparent: true, opacity: 0.26 });
   group.add(new THREE.LineSegments(normalGeo, normalMat));
 
   const critGeo = new THREE.BufferGeometry();
@@ -172,7 +172,7 @@ function initHero3D(mount) {
     const color = isCrit ? GOLD_BRIGHT : (CAT_COLOR[n.cat] || 0x948D78);
     const mat = new THREE.SpriteMaterial({
       map: spriteTex, color, transparent: true,
-      opacity: isCrit ? 0.95 : 0.55, depthWrite: false, blending: THREE.AdditiveBlending
+      opacity: isCrit ? 0.98 : 0.7, depthWrite: false, blending: THREE.AdditiveBlending
     });
     const sprite = new THREE.Sprite(mat);
     const scale = isCrit ? 0.42 : 0.3;
