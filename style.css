@@ -444,7 +444,7 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
 
 .hero{position:relative;overflow:hidden;padding:calc(58px + 6vh) 0 5vh;text-align:center;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .hero3d{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;transition:opacity 1.6s ease;}
-.hero3d.is-ready{opacity:0.6;}
+.hero3d.is-ready{opacity:0.85;}
 .hero3d canvas{display:block;width:100%;height:100%;}
 .hero-content{position:relative;z-index:1;width:100%;}
 .hero-content::before{
@@ -452,8 +452,8 @@ select.grade{background:var(--bg-panel-raised);color:var(--ink);border:1px solid
   position:absolute;
   left:50%;top:50%;
   transform:translate(-50%,-50%);
-  width:min(1000px,140%);height:130%;
-  background:radial-gradient(ellipse at center, var(--bg) 0%, rgba(18,18,16,0.9) 44%, rgba(18,18,16,0) 76%);
+  width:min(720px,88%);height:115%;
+  background:radial-gradient(ellipse at center, var(--bg) 0%, rgba(18,18,16,0.82) 35%, rgba(18,18,16,0) 65%);
   z-index:-1;
   pointer-events:none;
 }
